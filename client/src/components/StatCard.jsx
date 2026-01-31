@@ -1,35 +1,70 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatCard = ({ icon: Icon, label, value, trend, color = 'violet' }) => {
-  const colorClasses = {
-    violet: 'from-violet-500 to-fuchsia-500 shadow-violet-500/25',
-    blue: 'from-blue-500 to-cyan-500 shadow-blue-500/25',
-    emerald: 'from-emerald-500 to-teal-500 shadow-emerald-500/25',
-    amber: 'from-amber-500 to-orange-500 shadow-amber-500/25'
+const StatCard = ({ icon: Icon, label, value, trend, type = 'default' }) => {
+  const typeStyles = {
+    default: {
+      iconBg: 'bg-zinc-800/80',
+      iconColor: 'text-zinc-400',
+      glow: ''
+    },
+    emerald: {
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-400',
+      glow: 'shadow-emerald-500/5'
+    },
+    violet: {
+      iconBg: 'bg-violet-500/10',
+      iconColor: 'text-violet-400',
+      glow: 'shadow-violet-500/5'
+    },
+    purple: {
+      iconBg: 'bg-fuchsia-500/10',
+      iconColor: 'text-fuchsia-400',
+      glow: 'shadow-fuchsia-500/5'
+    },
+    blue: {
+      iconBg: 'bg-blue-500/10',
+      iconColor: 'text-blue-400',
+      glow: 'shadow-blue-500/5'
+    }
   };
 
+  const style = typeStyles[type] || typeStyles.default;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-slate-600/50 transition-all duration-300"
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-slate-400 text-sm font-medium mb-2">{label}</p>
-          <h3 className="text-3xl font-bold text-white">{value}</h3>
-          {trend && (
-            <p className={`text-xs mt-2 ${trend > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% from last week
-            </p>
+    <div className={`relative group bg-gradient-to-br from-zinc-900/80 to-zinc-950/80 border border-zinc-800/80 rounded-2xl p-6 hover:border-zinc-700/80 transition-all duration-300 ${style.glow} shadow-xl`}>
+      {/* Subtle gradient overlay on hover */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <div className="relative">
+        <div className="flex items-start justify-between mb-4">
+          <div className={`p-3 ${style.iconBg} rounded-xl border border-zinc-700/30`}>
+            <Icon className={`w-5 h-5 ${style.iconColor}`} />
+          </div>
+          {trend !== undefined && trend !== null && (
+            <div className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg ${
+              trend > 0 
+                ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' 
+                : trend < 0 
+                  ? 'text-red-400 bg-red-500/10 border border-red-500/20'
+                  : 'text-zinc-400 bg-zinc-800/50 border border-zinc-700/50'
+            }`}>
+              {trend > 0 ? (
+                <TrendingUp className="w-3 h-3" />
+              ) : trend < 0 ? (
+                <TrendingDown className="w-3 h-3" />
+              ) : null}
+              {trend > 0 ? '+' : ''}{trend}%
+            </div>
           )}
         </div>
-        <div className={`p-3 rounded-xl bg-gradient-to-br ${colorClasses[color]} shadow-lg`}>
-          <Icon className="w-6 h-6 text-white" />
+        <div>
+          <p className="text-zinc-500 text-sm font-medium mb-1.5">{label}</p>
+          <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

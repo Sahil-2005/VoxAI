@@ -12,12 +12,16 @@ import {
   Clock,
   MessageSquare,
   Loader2,
-  Sparkles
+  Sparkles,
+  Filter,
+  Grid3X3,
+  List
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { botService } from '../services/botService';
+import { Link } from 'react-router-dom';
 
 const VoiceAgents = () => {
   const [bots, setBots] = useState([]);
@@ -26,6 +30,7 @@ const VoiceAgents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBot, setEditingBot] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -124,101 +129,127 @@ const VoiceAgents = () => {
   );
 
   return (
-    <div className="p-8">
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
-      >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Voice Agents</h1>
-          <p className="text-slate-400">Create and manage your AI voice agents</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Voice Agents</h1>
+          <p className="text-zinc-400 mt-1">Create and manage your AI voice agents</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
           Create Agent
         </Button>
-      </motion.div>
+      </div>
 
-      {/* Search */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="mb-6"
-      >
-        <div className="relative max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="text"
             placeholder="Search agents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-zinc-900/50 border border-zinc-800/80 rounded-xl text-white placeholder:text-zinc-600 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
           />
         </div>
-      </motion.div>
+        <div className="flex gap-2">
+          <button className="px-4 py-2.5 bg-zinc-900/50 border border-zinc-800/80 rounded-xl text-zinc-400 hover:text-white hover:border-zinc-700 transition-all flex items-center gap-2 text-sm font-medium">
+            <Filter className="w-4 h-4" />
+            Filters
+          </button>
+          <div className="flex bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-1">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}
+            >
+              <Grid3X3 className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-white'}`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-violet-500 animate-spin" />
+            <p className="text-zinc-500 text-sm">Loading your agents...</p>
+          </div>
         </div>
       ) : filteredBots.length === 0 ? (
         /* Empty State */
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-16"
-        >
-          <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Bot className="w-10 h-10 text-slate-600" />
+        <div className="text-center py-20 border border-zinc-800/80 rounded-2xl bg-gradient-to-br from-zinc-900/50 to-zinc-950/50">
+          <div className="w-20 h-20 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-violet-500/20">
+            <Bot className="w-10 h-10 text-violet-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No agents yet</h3>
-          <p className="text-slate-400 mb-6 max-w-md mx-auto">
+          <h3 className="text-xl font-bold text-white mb-2">No agents yet</h3>
+          <p className="text-zinc-500 mb-8 max-w-md mx-auto">
             Create your first voice agent to start automating customer conversations.
           </p>
           <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
             Create Your First Agent
           </Button>
-        </motion.div>
+        </div>
       ) : (
         /* Bots Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <AnimatePresence>
             {filteredBots.map((bot, i) => (
               <motion.div
                 key={bot._id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-violet-500/30 transition-all group"
+                className="relative bg-gradient-to-br from-zinc-900/80 to-zinc-950/80 border border-zinc-800/80 rounded-2xl p-6 hover:border-zinc-700/80 transition-all group"
               >
+                {/* Active indicator glow */}
+                {bot.isActive && (
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+                )}
+
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/25">
-                      <Bot className="w-6 h-6 text-white" />
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-xl flex items-center justify-center border border-violet-500/20">
+                        <Bot className="w-6 h-6 text-violet-400" />
+                      </div>
+                      {bot.isActive && (
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-zinc-900 rounded-full" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">{bot.name}</h3>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${bot.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
-                        {bot.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          bot.isActive 
+                            ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' 
+                            : 'text-zinc-500 bg-zinc-800/50 border border-zinc-700/50'
+                        }`}>
+                          {bot.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                       onClick={() => handleEdit(bot)}
-                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                      className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-all"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDelete(bot._id)}
-                      className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                      className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -226,35 +257,35 @@ const VoiceAgents = () => {
                 </div>
 
                 {/* Description */}
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                <p className="text-zinc-400 text-sm mb-5 line-clamp-2 h-10">
                   {bot.description || 'No description provided'}
                 </p>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center">
-                    <Phone className="w-4 h-4 text-slate-500 mx-auto mb-1" />
-                    <p className="text-lg font-semibold text-white">{bot.stats?.totalCalls || 0}</p>
-                    <p className="text-xs text-slate-500">Calls</p>
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                  <div className="text-center p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/50">
+                    <p className="text-lg font-bold text-white">{bot.stats?.totalCalls || 0}</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Calls</p>
                   </div>
-                  <div className="text-center">
-                    <Clock className="w-4 h-4 text-slate-500 mx-auto mb-1" />
-                    <p className="text-lg font-semibold text-white">{bot.stats?.totalMinutes || 0}m</p>
-                    <p className="text-xs text-slate-500">Minutes</p>
+                  <div className="text-center p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/50">
+                    <p className="text-lg font-bold text-white">{bot.stats?.totalMinutes || 0}m</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Mins</p>
                   </div>
-                  <div className="text-center">
-                    <MessageSquare className="w-4 h-4 text-slate-500 mx-auto mb-1" />
-                    <p className="text-lg font-semibold text-white">{bot.stats?.successRate || 0}%</p>
-                    <p className="text-xs text-slate-500">Success</p>
+                  <div className="text-center p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/50">
+                    <p className="text-lg font-bold text-white">{bot.stats?.successRate || 0}%</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">Rate</p>
                   </div>
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
-                  <span className="text-xs text-slate-500 capitalize">{bot.personality} • {bot.voiceType}</span>
-                  <Button variant="ghost" size="sm">
-                    Test <Phone className="w-4 h-4 ml-1" />
-                  </Button>
+                <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
+                  <span className="text-xs text-zinc-500 capitalize flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                    {bot.personality} • {bot.voiceType}
+                  </span>
+                  <Link to={`/dashboard/agents/${bot._id}`} className="text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors">
+                    View Details →
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -267,9 +298,10 @@ const VoiceAgents = () => {
         isOpen={isModalOpen} 
         onClose={closeModal}
         title={editingBot ? 'Edit Agent' : 'Create New Agent'}
+        subtitle={editingBot ? 'Update your agent configuration' : 'Configure your new AI voice agent'}
         size="lg"
       >
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input
               label="Agent Name"
@@ -281,12 +313,12 @@ const VoiceAgents = () => {
             />
             
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300">Voice Type</label>
+              <label className="block text-sm font-medium text-zinc-300">Voice Type</label>
               <select
                 name="voiceType"
                 value={formData.voiceType}
                 onChange={handleInputChange}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl text-white px-4 py-3 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl text-white px-4 py-3 text-sm focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
               >
                 <option value="female">Female</option>
                 <option value="male">Male</option>
@@ -304,8 +336,8 @@ const VoiceAgents = () => {
           />
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-300">Personality</label>
-            <div className="grid grid-cols-4 gap-3">
+            <label className="block text-sm font-medium text-zinc-300">Personality</label>
+            <div className="grid grid-cols-4 gap-2">
               {['professional', 'friendly', 'casual', 'formal'].map((p) => (
                 <button
                   key={p}
@@ -313,8 +345,8 @@ const VoiceAgents = () => {
                   onClick={() => setFormData({ ...formData, personality: p })}
                   className={`px-4 py-2.5 rounded-xl text-sm font-medium capitalize transition-all ${
                     formData.personality === p 
-                      ? 'bg-violet-600 text-white' 
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white border border-violet-400/20' 
+                      : 'bg-zinc-900/50 text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white'
                   }`}
                 >
                   {p}
@@ -324,8 +356,8 @@ const VoiceAgents = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-300">
-              <Sparkles className="w-4 h-4 inline mr-1 text-violet-400" />
+            <label className="block text-sm font-medium text-zinc-300 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-violet-400" />
               System Prompt
             </label>
             <textarea
@@ -335,7 +367,7 @@ const VoiceAgents = () => {
               placeholder="You are a helpful customer service agent..."
               rows={4}
               required
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl text-white placeholder:text-slate-500 px-4 py-3 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
+              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-600 px-4 py-3 text-sm focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
             />
           </div>
 
@@ -347,7 +379,7 @@ const VoiceAgents = () => {
             placeholder="Hello! How can I assist you today?"
           />
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800/50">
             <Button variant="secondary" type="button" onClick={closeModal}>
               Cancel
             </Button>
