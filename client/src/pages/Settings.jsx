@@ -40,11 +40,11 @@ const Settings = () => {
     const fetchTwilioConfig = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE}/users/me`, {
+            const response = await axios.get(`${API_BASE}/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (response.data?.twilioConfig) {
-                setTwilioConfig(response.data.twilioConfig);
+            if (response.data?.data?.user?.twilioConfig) {
+                setTwilioConfig(response.data.data.user.twilioConfig);
             }
         } catch (error) {
             console.error('Failed to fetch Twilio config:', error);
@@ -108,7 +108,7 @@ const Settings = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `${API_BASE}/users/twilio-config`,
+                `${API_BASE}/auth/twilio`,
                 twilioConfig,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -291,8 +291,8 @@ const Settings = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
                                         className={`flex items-center gap-3 p-4 rounded-xl ${verificationStatus === 'success'
-                                                ? 'bg-emerald-500/10 border border-emerald-500/20'
-                                                : 'bg-red-500/10 border border-red-500/20'
+                                            ? 'bg-emerald-500/10 border border-emerald-500/20'
+                                            : 'bg-red-500/10 border border-red-500/20'
                                             }`}
                                     >
                                         {verificationStatus === 'success' ? (
