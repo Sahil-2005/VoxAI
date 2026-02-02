@@ -1,68 +1,39 @@
 import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const StatCard = ({ icon: Icon, label, value, trend, type = 'default' }) => {
   const typeStyles = {
-    default: {
-      iconBg: 'bg-zinc-800/80',
-      iconColor: 'text-zinc-400',
-      glow: ''
-    },
-    emerald: {
-      iconBg: 'bg-emerald-500/10',
-      iconColor: 'text-emerald-400',
-      glow: 'shadow-emerald-500/5'
-    },
-    violet: {
-      iconBg: 'bg-violet-500/10',
-      iconColor: 'text-violet-400',
-      glow: 'shadow-violet-500/5'
-    },
-    purple: {
-      iconBg: 'bg-fuchsia-500/10',
-      iconColor: 'text-fuchsia-400',
-      glow: 'shadow-fuchsia-500/5'
-    },
-    blue: {
-      iconBg: 'bg-blue-500/10',
-      iconColor: 'text-blue-400',
-      glow: 'shadow-blue-500/5'
-    }
+    default: 'bg-gradient-to-br from-zinc-900 to-zinc-900/50 border-zinc-800 hover:border-zinc-700',
+    emerald: 'bg-gradient-to-br from-emerald-900/20 to-zinc-900/50 border-emerald-500/20 hover:border-emerald-500/30',
+    purple: 'bg-gradient-to-br from-purple-900/20 to-zinc-900/50 border-purple-500/20 hover:border-purple-500/30',
+    blue: 'bg-gradient-to-br from-blue-900/20 to-zinc-900/50 border-blue-500/20 hover:border-blue-500/30'
   };
 
-  const style = typeStyles[type] || typeStyles.default;
+  const iconColors = {
+    default: 'text-zinc-400',
+    emerald: 'text-emerald-400',
+    purple: 'text-purple-400',
+    blue: 'text-blue-400'
+  };
 
   return (
-    <div className={`relative group bg-gradient-to-br from-zinc-900/80 to-zinc-950/80 border border-zinc-800/80 rounded-2xl p-6 hover:border-zinc-700/80 transition-all duration-300 ${style.glow} shadow-xl`}>
-      {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <div className="relative">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 ${style.iconBg} rounded-xl border border-zinc-700/30`}>
-            <Icon className={`w-5 h-5 ${style.iconColor}`} />
+    <div className={`border rounded-xl p-6 transition-all duration-300 hover-lift group ${typeStyles[type]}`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="p-2.5 bg-zinc-800/70 rounded-lg border border-zinc-700/50 group-hover:bg-zinc-800 transition-colors">
+          <Icon className={`w-5 h-5 ${iconColors[type]} transition-colors`} />
+        </div>
+        {trend !== undefined && (
+          <div className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border transition-all ${
+            trend > 0 
+              ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' 
+              : 'text-red-400 bg-red-500/10 border-red-500/20'
+          }`}>
+            {trend > 0 ? '+' : ''}{trend}%
           </div>
-          {trend !== undefined && trend !== null && (
-            <div className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg ${
-              trend > 0 
-                ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' 
-                : trend < 0 
-                  ? 'text-red-400 bg-red-500/10 border border-red-500/20'
-                  : 'text-zinc-400 bg-zinc-800/50 border border-zinc-700/50'
-            }`}>
-              {trend > 0 ? (
-                <TrendingUp className="w-3 h-3" />
-              ) : trend < 0 ? (
-                <TrendingDown className="w-3 h-3" />
-              ) : null}
-              {trend > 0 ? '+' : ''}{trend}%
-            </div>
-          )}
-        </div>
-        <div>
-          <p className="text-zinc-500 text-sm font-medium mb-1.5">{label}</p>
-          <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
-        </div>
+        )}
+      </div>
+      <div>
+        <p className="text-zinc-400 text-sm font-medium mb-1.5">{label}</p>
+        <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
       </div>
     </div>
   );
