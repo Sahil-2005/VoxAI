@@ -17,6 +17,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import AuthNavbar from '../components/AuthNavbar';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -52,7 +53,6 @@ const Login = () => {
                 ease: 'power3.out'
             }, '-=0.6')
             .from('.form-element', {
-                opacity: 0,
                 y: 20,
                 duration: 0.5,
                 stagger: 0.1,
@@ -108,6 +108,8 @@ const Login = () => {
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
             </div>
+
+            <AuthNavbar />
 
             {/* Left Panel - Visual */}
             <div className="login-visual hidden lg:flex flex-1 items-center justify-center p-12 relative">
@@ -167,16 +169,6 @@ const Login = () => {
             {/* Right Panel - Form */}
             <div className="login-form flex-1 flex items-center justify-center p-6 lg:p-12">
                 <div className="w-full max-w-md">
-                    {/* Mobile Logo */}
-                    <div className="lg:hidden text-center mb-8 form-element">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-2xl border border-white/10 mb-4">
-                            <Mic className="w-8 h-8 text-violet-400" />
-                        </div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                            VoxAI
-                        </h1>
-                    </div>
-
                     {/* Form Card */}
                     <div className="relative group">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
@@ -253,7 +245,7 @@ const Login = () => {
                                     disabled={isLoading}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="form-element w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl text-white font-semibold hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-violet-500/25"
+                                    className="form-element w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl text-white font-semibold hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-violet-500/30"
                                 >
                                     {isLoading ? (
                                         <>

@@ -34,7 +34,6 @@ const DashboardLayout = ({ children }) => {
     // GSAP animations
     useGSAP(() => {
         gsap.from('.sidebar-item', {
-            opacity: 0,
             x: -20,
             duration: 0.4,
             stagger: 0.08,
@@ -43,7 +42,6 @@ const DashboardLayout = ({ children }) => {
         });
 
         gsap.from('.sidebar-logo', {
-            opacity: 0,
             y: -10,
             duration: 0.5,
             ease: 'power3.out'
