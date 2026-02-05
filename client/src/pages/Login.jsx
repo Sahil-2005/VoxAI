@@ -202,7 +202,7 @@ const Login = () => {
 
                                 {/* Email Input */}
                                 <div className="form-element space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Email</label>
+                                    <label className="text-sm font-semibold text-white">Email</label>
                                     <div className="relative group/input">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within/input:text-violet-400 transition-colors" />
                                         <input
@@ -217,7 +217,7 @@ const Login = () => {
 
                                 {/* Password Input */}
                                 <div className="form-element space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Password</label>
+                                    <label className="text-sm font-semibold text-white">Password</label>
                                     <div className="relative group/input">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within/input:text-violet-400 transition-colors" />
                                         <input

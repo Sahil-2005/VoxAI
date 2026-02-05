@@ -207,13 +207,13 @@ const Landing = () => {
                         </Link>
 
                         <div className="hidden md:flex items-center gap-8">
-                            <a href="#features" className="text-zinc-400 hover:text-zinc-100 transition-colors">Features</a>
-                            <a href="#pricing" className="text-zinc-400 hover:text-zinc-100 transition-colors">Pricing</a>
-                            <a href="#testimonials" className="text-zinc-400 hover:text-zinc-100 transition-colors">Testimonials</a>
+                            <a href="#features" className="text-white/90 hover:text-white transition-colors font-medium">Features</a>
+                            <a href="#pricing" className="text-white/90 hover:text-white transition-colors font-medium">Pricing</a>
+                            <a href="#testimonials" className="text-white/90 hover:text-white transition-colors font-medium">Testimonials</a>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Link to="/login" className="text-zinc-300 hover:text-white transition-colors">
+                            <Link to="/login" className="text-white hover:text-white/80 transition-colors font-semibold">
                                 Sign In
                             </Link>
                             <Link
@@ -459,8 +459,8 @@ const Landing = () => {
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
                                 className={`relative bg-zinc-900/60 backdrop-blur-xl rounded-2xl border p-8 ${plan.popular
-                                        ? 'border-violet-500/50 shadow-lg shadow-violet-500/10'
-                                        : 'border-white/5'
+                                    ? 'border-violet-500/50 shadow-lg shadow-violet-500/10'
+                                    : 'border-white/5'
                                     }`}
                             >
                                 {plan.popular && (
@@ -491,8 +491,8 @@ const Landing = () => {
                                 <Link
                                     to="/register"
                                     className={`block w-full py-3 rounded-xl font-medium text-center transition-all ${plan.popular
-                                            ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-500 hover:to-fuchsia-500'
-                                            : 'bg-zinc-800 text-zinc-100 hover:bg-zinc-700 border border-white/10'
+                                        ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-500 hover:to-fuchsia-500'
+                                        : 'bg-zinc-800 text-zinc-100 hover:bg-zinc-700 border border-white/10'
                                         }`}
                                 >
                                     {plan.cta}

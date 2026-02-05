@@ -2,6 +2,15 @@
 
 /* Premium SaaS Global Styles */
 
+/*
+ * Color Contrast Guidelines:
+ * - Use zinc-100 (#fafafa) for primary text on dark backgrounds
+ * - Use zinc-200 (#e4e4e7) for secondary text and labels
+ * - Use zinc-300 (#d4d4d8) for tertiary text and icons
+ * - Use zinc-400 (#a1a1aa) for muted text only
+ * - Avoid zinc-500+ for text on dark backgrounds (poor contrast)
+ */
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -243,6 +252,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 input[type='number'] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
