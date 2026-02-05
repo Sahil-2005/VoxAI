@@ -110,8 +110,8 @@ const DashboardLayout = ({ children }) => {
                                     to={item.path}
                                     onClick={() => setIsSidebarOpen(false)}
                                     className={`sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative ${isActive
-                                            ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-zinc-100'
-                                            : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50'
+                                        ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-white'
+                                        : 'text-white/90 hover:text-white hover:bg-zinc-800/50'
                                         }`}
                                 >
                                     {isActive && (
@@ -120,7 +120,7 @@ const DashboardLayout = ({ children }) => {
                                             className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-violet-500 to-fuchsia-500 rounded-r-full"
                                         />
                                     )}
-                                    <Icon className={`w-5 h-5 ${isActive ? 'text-violet-400' : 'group-hover:text-violet-400'} transition-colors`} />
+                                    <Icon className={`w-5 h-5 ${isActive ? 'text-violet-400' : 'text-white/80 group-hover:text-violet-400'} transition-colors`} />
                                     <span className="font-medium">{item.label}</span>
                                     {isActive && (
                                         <ChevronRight className="w-4 h-4 ml-auto text-violet-400" />

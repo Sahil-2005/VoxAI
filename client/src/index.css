@@ -1,1 +1,2 @@
-@import "tailwindcss";
+/* Import all global styles from App.css */
+@import "./App.css";
