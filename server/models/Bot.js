@@ -73,21 +73,7 @@ const BotSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Auto-generate slug from name before saving
-BotSchema.pre('save', function(next) {
-  if (this.isModified('name') && !this.slug) {
-    // Create slug: lowercase, replace spaces with underscores, add random suffix
-    const baseSlug = this.name.toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_+|_+$/g, '');
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
-    this.slug = `${baseSlug}_${randomSuffix}`;
-  }
-  next();
-});
-
 // Index for faster queries
 BotSchema.index({ user: 1, createdAt: -1 });
-BotSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Bot', BotSchema);

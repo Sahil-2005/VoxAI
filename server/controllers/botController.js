@@ -8,6 +8,13 @@ exports.createBot = async (req, res, next) => {
   try {
     const { name, description, voiceType, language, systemPrompt, greeting, personality, scriptFlow } = req.body;
     
+    // Generate slug from name
+    const baseSlug = name.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const slug = `${baseSlug}_${randomSuffix}`;
+    
     const bot = await Bot.create({
       user: req.user.id,
       name,
@@ -17,7 +24,8 @@ exports.createBot = async (req, res, next) => {
       systemPrompt,
       greeting,
       personality,
-      scriptFlow: scriptFlow || []
+      scriptFlow: scriptFlow || [],
+      slug
     });
 
     res.status(HTTP_STATUS.CREATED).json({

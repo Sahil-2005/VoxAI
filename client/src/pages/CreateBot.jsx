@@ -14,10 +14,12 @@ import {
     Loader2,
     AlertCircle,
     Wand2,
-    FileText
+    FileText,
+    Phone
 } from 'lucide-react';
 import axios from 'axios';
 import ScriptBuilder from '../components/ScriptBuilder';
+import TriggerCall from '../components/TriggerCall';
 
 const API_BASE = 'http://localhost:5000/api';
 
