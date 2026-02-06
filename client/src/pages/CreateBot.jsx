@@ -201,7 +201,7 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                     {/* Tabs Navigation */}
                     <div className="sticky top-[73px] z-10 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 px-6">
                         <div className="flex gap-1">
-                            {['Basic Info', 'Voice & Personality', 'Script Flow', 'AI Behavior'].map((tab, index) => (
+                            {['Basic Info', 'Voice & Personality', 'Script Flow', 'AI Behavior', 'Test Call'].map((tab, index) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(index)}
@@ -468,6 +468,36 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                                             )}
                                         </div>
                                     </div>
+                                </section>
+                            )}
+
+                            {/* Tab 4: Test Call Section */}
+                            {activeTab === 4 && (
+                                <section>
+                                    <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
+                                        <Phone className="w-5 h-5 text-violet-400" />
+                                        Test Call
+                                    </h3>
+                                    {editBot ? (
+                                        <TriggerCall
+                                            botId={editBot._id}
+                                            botName={editBot.name}
+                                            hasScriptFlow={formData.scriptFlow && formData.scriptFlow.length > 0}
+                                            hasAudioGenerated={editBot.hasAudioGenerated}
+                                        />
+                                    ) : (
+                                        <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-xl">
+                                            <div className="flex items-start gap-3">
+                                                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                                <div>
+                                                    <p className="text-sm font-medium text-amber-300">Save Bot First</p>
+                                                    <p className="text-xs text-amber-400/70 mt-1">
+                                                        You need to save the bot before you can test calls. Click "Create Bot" below to save.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </section>
                             )}
 

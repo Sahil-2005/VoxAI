@@ -296,9 +296,10 @@ exports.generateAudio = async (req, res, next) => {
     const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
     
     try {
-      await axios.post(`${CALLENGINE_URL}/scripts/${bot.slug}/generate-audio`, {
+      const response = await axios.post(`${CALLENGINE_URL}/calls/${bot.slug}/generate-audio`, {
         script_data: {
           slug: bot.slug,
+          name: bot.name,
           language: bot.language,
           voice_type: bot.voiceType,
           flow: bot.scriptFlow
