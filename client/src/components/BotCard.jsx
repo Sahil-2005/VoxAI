@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Bot,
@@ -79,6 +80,7 @@ const BotCard = ({
     onTestCall,
     onToggleActive
 }) => {
+    const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(false);
     const [isToggling, setIsToggling] = useState(false);
 
@@ -95,6 +97,12 @@ const BotCard = ({
         }
     };
 
+    const handleCardClick = (e) => {
+        // Don't navigate if clicking on buttons or interactive elements
+        if (e.target.closest('button')) return;
+        navigate(`/bots/${bot._id}`);
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -106,7 +114,10 @@ const BotCard = ({
             {/* Glow effect on hover */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            <div className="relative bg-zinc-900/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all duration-300">
+            <div
+                onClick={handleCardClick}
+                className="relative bg-zinc-900/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all duration-300 cursor-pointer"
+            >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">

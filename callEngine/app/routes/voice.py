@@ -60,8 +60,13 @@ async def start_call(request: Request):
 
     vr = VoiceResponse()
     
-    # Play Intro
-    vr.play(f"{BASE_URL}/static/{script_slug}/intro.mp3")
+    # Check if script has intro audio file, otherwise use Say
+    intro_path = f"app/static/{script_slug}/intro.mp3"
+    if os.path.exists(intro_path):
+        vr.play(f"{BASE_URL}/static/{script_slug}/intro.mp3")
+    else:
+        # Fallback for dynamic scripts without intro file
+        vr.say("Hello! Press any key to continue.", voice="Polly.Joanna", language="en-US")
 
     # Wait for button press to start
     gather = Gather(
@@ -114,12 +119,20 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     if not user_input or len(user_input.strip()) < 1:
         if retry >= 2:
             # Failed 3 times, play outro and hangup
-            vr.play(f"{BASE_URL}/static/{script}/outro.mp3")
+            outro_path = f"app/static/{script}/outro.mp3"
+            if os.path.exists(outro_path):
+                vr.play(f"{BASE_URL}/static/{script}/outro.mp3")
+            else:
+                vr.say("Thank you for your time. Goodbye!", voice="Polly.Joanna", language="en-US")
             vr.hangup()
             return Response(str(vr), media_type="application/xml")
 
         # Play error and ask SAME question again
-        vr.play(f"{BASE_URL}/static/{script}/error.mp3")
+        error_path = f"app/static/{script}/error.mp3"
+        if os.path.exists(error_path):
+            vr.play(f"{BASE_URL}/static/{script}/error.mp3")
+        else:
+            vr.say("Sorry, I didn't catch that. Please try again.", voice="Polly.Joanna", language="en-US")
         return await ask_question(vr, step, retry + 1, script, QUESTIONS)
 
     # ✅ SAVE ANSWER TO DB
@@ -134,7 +147,11 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
 
     if next_step >= len(QUESTIONS):
         # END OF CONVERSATION
-        vr.play(f"{BASE_URL}/static/{script}/outro.mp3")
+        outro_path = f"app/static/{script}/outro.mp3"
+        if os.path.exists(outro_path):
+            vr.play(f"{BASE_URL}/static/{script}/outro.mp3")
+        else:
+            vr.say("Thank you for your responses. Have a great day!", voice="Polly.Joanna", language="en-US")
         vr.hangup()
         return Response(str(vr), media_type="application/xml")
 

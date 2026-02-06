@@ -9,6 +9,8 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import CreateBot from './pages/CreateBot';
+import BotDetails from './pages/BotDetails';
 import Settings from './pages/Settings';
 
 import './App.css';
@@ -85,6 +87,32 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <PageWrapper><Settings /></PageWrapper>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bots/create"
+          element={
+            <ProtectedRoute>
+              <PageWrapper><CreateBot /></PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bots/edit/:id"
+          element={
+            <ProtectedRoute>
+              <PageWrapper><CreateBot /></PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bots/:id"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PageWrapper><BotDetails /></PageWrapper>
               </DashboardLayout>
             </ProtectedRoute>
           }
