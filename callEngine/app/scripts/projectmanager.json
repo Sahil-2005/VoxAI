@@ -1,0 +1,56 @@
+{
+  "slug": "projectmanager",
+  "flow": [
+    {
+      "key": "intro",
+      "text": "Hello! I'm your Project Management Assistant. Press any key to continue.",
+      "is_question": false
+    },
+    {
+      "key": "project_name",
+      "text": "What is the name of your project?",
+      "hints": "website, mobile app, dashboard, API, platform",
+      "is_question": true
+    },
+    {
+      "key": "member_name",
+      "text": "What is your name?",
+      "hints": "",
+      "is_question": true
+    },
+    {
+      "key": "role",
+      "text": "What is your role in this project?",
+      "hints": "developer, designer, manager, tester, analyst",
+      "is_question": true
+    },
+    {
+      "key": "task_status",
+      "text": "What is your current task status?",
+      "hints": "in progress, completed, blocked, not started, testing",
+      "is_question": true
+    },
+    {
+      "key": "blockers",
+      "text": "Are there any blockers or issues? Say none if there are no issues.",
+      "hints": "none, technical issue, waiting for review, need resources, dependency",
+      "is_question": true
+    },
+    {
+      "key": "completion_time",
+      "text": "When do you estimate completion?",
+      "hints": "today, tomorrow, this week, next week, two weeks",
+      "is_question": true
+    },
+    {
+      "key": "outro",
+      "text": "Thank you! Your project update has been recorded successfully.",
+      "is_question": false
+    },
+    {
+      "key": "error",
+      "text": "Sorry, I didn't catch that. Please try again.",
+      "is_question": false
+    }
+  ]
+}
