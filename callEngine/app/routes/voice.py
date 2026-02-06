@@ -35,10 +35,24 @@ load_scripts()
 async def start_call(request: Request):
     script_slug = request.query_params.get("script", "agrosathi")
     
-    if script_slug not in SCRIPTS_CACHE:
+    # Try to load from database first
+    from app.database import get_database
+    db = get_database()
+    script_data = None
+    
+    if db is not None:
+        script_data = await db["scripts"].find_one({"slug": script_slug})
+    
+    # Fallback to cache if not in database
+    if not script_data and script_slug not in SCRIPTS_CACHE:
         load_scripts()
-        
-    if script_slug not in SCRIPTS_CACHE:
+    
+    # Use database script or cache
+    if script_data:
+        questions = [item for item in script_data.get("flow", []) if item.get("is_question")]
+    elif script_slug in SCRIPTS_CACHE:
+        questions = SCRIPTS_CACHE[script_slug]["questions"]
+    else:
         vr = VoiceResponse()
         vr.say("System error. Script not found.")
         vr.hangup()
@@ -69,14 +83,24 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     call_id = form.get("CallSid")
     user_phone = form.get("To")
 
-    if script not in SCRIPTS_CACHE:
+    # Load script from database or cache
+    from app.database import get_database
+    db = get_database()
+    script_data = None
+    
+    if db is not None:
+        script_data = await db["scripts"].find_one({"slug": script})
+    
+    if not script_data and script not in SCRIPTS_CACHE:
         load_scripts()
     
-    script_data = SCRIPTS_CACHE.get(script)
-    if not script_data:
+    # Get questions
+    if script_data:
+        QUESTIONS = [item for item in script_data.get("flow", []) if item.get("is_question")]
+    elif script in SCRIPTS_CACHE:
+        QUESTIONS = SCRIPTS_CACHE[script]["questions"]
+    else:
         return Response(str(VoiceResponse().hangup()), media_type="application/xml")
-
-    QUESTIONS = script_data["questions"]
     vr = VoiceResponse()
 
     # --- HANDLE START ---

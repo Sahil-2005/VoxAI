@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-from app.routes import voice, call
+from app.routes import voice, call, calls
 from app.database import connect_to_mongo, close_mongo_connection
 
 # 🟢 LIFESPAN context manager (Modern FastAPI)
@@ -20,3 +20,4 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(voice.router, prefix="/voice")
 app.include_router(call.router)
+app.include_router(calls.router, prefix="/calls")

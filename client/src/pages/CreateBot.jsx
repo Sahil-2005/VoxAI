@@ -13,9 +13,11 @@ import {
     Check,
     Loader2,
     AlertCircle,
-    Wand2
+    Wand2,
+    FileText
 } from 'lucide-react';
 import axios from 'axios';
+import ScriptBuilder from '../components/ScriptBuilder';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -33,13 +35,15 @@ const personalities = [
 ];
 
 const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
+    const [activeTab, setActiveTab] = useState(0);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         voiceType: 'female',
         personality: 'professional',
         systemPrompt: '',
-        greeting: 'Hello! How can I assist you today?'
+        greeting: 'Hello! How can I assist you today?',
+        scriptFlow: []
     });
 
     const [errors, setErrors] = useState({});
@@ -55,7 +59,8 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                 voiceType: editBot.voiceType || 'female',
                 personality: editBot.personality || 'professional',
                 systemPrompt: editBot.systemPrompt || '',
-                greeting: editBot.greeting || 'Hello! How can I assist you today?'
+                greeting: editBot.greeting || 'Hello! How can I assist you today?',
+                scriptFlow: editBot.scriptFlow || []
             });
         } else {
             // Reset form for new bot
@@ -65,10 +70,12 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                 voiceType: 'female',
                 personality: 'professional',
                 systemPrompt: '',
-                greeting: 'Hello! How can I assist you today?'
+                greeting: 'Hello! How can I assist you today?',
+                scriptFlow: []
             });
         }
         setErrors({});
+        setActiveTab(0);
     }, [editBot, isOpen]);
 
     const handleInputChange = (field, value) => {
@@ -189,234 +196,278 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                         </div>
                     </div>
 
+                    {/* Tabs Navigation */}
+                    <div className="sticky top-[73px] z-10 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 px-6">
+                        <div className="flex gap-1">
+                            {['Basic Info', 'Voice & Personality', 'Script Flow', 'AI Behavior'].map((tab, index) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(index)}
+                                    className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === index
+                                        ? 'text-violet-400'
+                                        : 'text-zinc-400 hover:text-zinc-300'
+                                        }`}
+                                >
+                                    {tab}
+                                    {activeTab === index && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"
+                                        />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Form Content */}
-                    <div className="overflow-y-auto h-[calc(100vh-140px)] px-6 py-6">
+                    <div className="overflow-y-auto h-[calc(100vh-220px)] px-6 py-6">
                         <div className="space-y-8">
-                            {/* Basic Info Section */}
-                            <section>
-                                <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
-                                    <Sparkles className="w-5 h-5 text-violet-400" />
-                                    Basic Information
-                                </h3>
+                            {/* Tab 0: Basic Info Section */}
+                            {activeTab === 0 && (
+                                <section>
+                                    <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
+                                        <Sparkles className="w-5 h-5 text-violet-400" />
+                                        Basic Information
+                                    </h3>
 
-                                <div className="space-y-4">
-                                    {/* Name Input */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-sm font-medium text-zinc-300">Bot Name</label>
-                                            <span className={`text-xs ${formData.name.length > 50 ? 'text-red-400' : 'text-zinc-500'}`}>
-                                                {formData.name.length}/50
-                                            </span>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={formData.name}
-                                            onChange={(e) => handleInputChange('name', e.target.value)}
-                                            placeholder="e.g., Customer Support Agent"
-                                            className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all ${errors.name ? 'border-red-500/50' : 'border-white/10'
-                                                }`}
-                                        />
-                                        {errors.name && (
-                                            <p className="text-sm text-red-400 flex items-center gap-1">
-                                                <AlertCircle className="w-3 h-3" />
-                                                {errors.name}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Description Input */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-sm font-medium text-zinc-300">Description</label>
-                                            <span className={`text-xs ${formData.description.length > 500 ? 'text-red-400' : 'text-zinc-500'}`}>
-                                                {formData.description.length}/500
-                                            </span>
-                                        </div>
-                                        <textarea
-                                            value={formData.description}
-                                            onChange={(e) => handleInputChange('description', e.target.value)}
-                                            placeholder="Describe what this bot does..."
-                                            rows={3}
-                                            className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all resize-none ${errors.description ? 'border-red-500/50' : 'border-white/10'
-                                                }`}
-                                        />
-                                        {errors.description && (
-                                            <p className="text-sm text-red-400 flex items-center gap-1">
-                                                <AlertCircle className="w-3 h-3" />
-                                                {errors.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* Voice Settings Section */}
-                            <section>
-                                <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
-                                    <Mic className="w-5 h-5 text-violet-400" />
-                                    Voice Settings
-                                </h3>
-
-                                <div className="space-y-4">
-                                    {/* Voice Type Cards */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-zinc-300">Voice Type</label>
-                                        <div className="grid grid-cols-3 gap-3">
-                                            {voiceTypes.map((voice) => {
-                                                const Icon = voice.icon;
-                                                const isSelected = formData.voiceType === voice.value;
-                                                return (
-                                                    <motion.button
-                                                        key={voice.value}
-                                                        whileHover={{ scale: 1.02 }}
-                                                        whileTap={{ scale: 0.98 }}
-                                                        onClick={() => handleInputChange('voiceType', voice.value)}
-                                                        className={`relative p-4 rounded-xl border transition-all ${isSelected
-                                                                ? 'bg-violet-500/10 border-violet-500/50 shadow-lg shadow-violet-500/10'
-                                                                : 'bg-zinc-900/50 border-white/10 hover:border-white/20'
-                                                            }`}
-                                                    >
-                                                        {isSelected && (
-                                                            <div className="absolute top-2 right-2">
-                                                                <Check className="w-4 h-4 text-violet-400" />
-                                                            </div>
-                                                        )}
-                                                        <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-violet-400' : 'text-zinc-400'}`} />
-                                                        <p className={`text-sm font-medium ${isSelected ? 'text-zinc-100' : 'text-zinc-300'}`}>
-                                                            {voice.label}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-500 mt-1">{voice.description}</p>
-                                                    </motion.button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-
-                                    {/* Personality Dropdown */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-zinc-300">Personality</label>
-                                        <div className="relative">
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPersonalityDropdown(!showPersonalityDropdown)}
-                                                className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition-all"
-                                            >
-                                                <span className="flex items-center gap-3">
-                                                    <span className={`w-3 h-3 rounded-full bg-gradient-to-r ${personalities.find(p => p.value === formData.personality)?.color
-                                                        }`} />
-                                                    {personalities.find(p => p.value === formData.personality)?.label}
+                                    <div className="space-y-4">
+                                        {/* Name Input */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-sm font-medium text-zinc-300">Bot Name</label>
+                                                <span className={`text-xs ${formData.name.length > 50 ? 'text-red-400' : 'text-zinc-500'}`}>
+                                                    {formData.name.length}/50
                                                 </span>
-                                                <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${showPersonalityDropdown ? 'rotate-180' : ''}`} />
-                                            </button>
-
-                                            <AnimatePresence>
-                                                {showPersonalityDropdown && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: -10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: -10 }}
-                                                        className="absolute z-20 w-full mt-2 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-xl"
-                                                    >
-                                                        {personalities.map((personality) => (
-                                                            <button
-                                                                key={personality.value}
-                                                                onClick={() => {
-                                                                    handleInputChange('personality', personality.value);
-                                                                    setShowPersonalityDropdown(false);
-                                                                }}
-                                                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors ${formData.personality === personality.value ? 'bg-zinc-800' : ''
-                                                                    }`}
-                                                            >
-                                                                <span className={`w-3 h-3 rounded-full bg-gradient-to-r ${personality.color}`} />
-                                                                <span className="text-zinc-100">{personality.label}</span>
-                                                                {formData.personality === personality.value && (
-                                                                    <Check className="w-4 h-4 text-violet-400 ml-auto" />
-                                                                )}
-                                                            </button>
-                                                        ))}
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* AI Behavior Section */}
-                            <section>
-                                <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
-                                    <Brain className="w-5 h-5 text-violet-400" />
-                                    AI Behavior
-                                </h3>
-
-                                <div className="space-y-4">
-                                    {/* System Prompt */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-sm font-medium text-zinc-300">System Prompt</label>
-                                            <div className="flex items-center gap-3">
-                                                <span className={`text-xs ${formData.systemPrompt.length > 5000 ? 'text-red-400' : 'text-zinc-500'}`}>
-                                                    {formData.systemPrompt.length}/5000
-                                                </span>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                    onClick={handleGeneratePrompt}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 border border-violet-500/30 rounded-lg text-xs font-medium text-violet-300 hover:from-violet-600/30 hover:to-fuchsia-600/30 transition-colors"
-                                                >
-                                                    <Wand2 className="w-3 h-3" />
-                                                    Generate with AI
-                                                </motion.button>
                                             </div>
-                                        </div>
-                                        <div className="relative">
-                                            <textarea
-                                                value={formData.systemPrompt}
-                                                onChange={(e) => handleInputChange('systemPrompt', e.target.value)}
-                                                placeholder="You are a helpful AI assistant specialized in..."
-                                                rows={8}
-                                                className={`w-full px-4 py-3 bg-zinc-900 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all resize-none font-mono text-sm ${errors.systemPrompt ? 'border-red-500/50' : 'border-white/10'
+                                            <input
+                                                type="text"
+                                                value={formData.name}
+                                                onChange={(e) => handleInputChange('name', e.target.value)}
+                                                placeholder="e.g., Customer Support Agent"
+                                                className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all ${errors.name ? 'border-red-500/50' : 'border-white/10'
                                                     }`}
                                             />
-                                            {/* Code editor style line numbers visual hint */}
-                                            <div className="absolute left-0 top-0 bottom-0 w-10 bg-zinc-950/50 rounded-l-xl pointer-events-none border-r border-white/5" />
+                                            {errors.name && (
+                                                <p className="text-sm text-red-400 flex items-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    {errors.name}
+                                                </p>
+                                            )}
                                         </div>
-                                        {errors.systemPrompt && (
-                                            <p className="text-sm text-red-400 flex items-center gap-1">
-                                                <AlertCircle className="w-3 h-3" />
-                                                {errors.systemPrompt}
-                                            </p>
-                                        )}
-                                    </div>
 
-                                    {/* Greeting */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-                                                <MessageSquare className="w-4 h-4 text-zinc-500" />
-                                                Greeting Message
-                                            </label>
-                                            <span className={`text-xs ${formData.greeting.length > 500 ? 'text-red-400' : 'text-zinc-500'}`}>
-                                                {formData.greeting.length}/500
-                                            </span>
+                                        {/* Description Input */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-sm font-medium text-zinc-300">Description</label>
+                                                <span className={`text-xs ${formData.description.length > 500 ? 'text-red-400' : 'text-zinc-500'}`}>
+                                                    {formData.description.length}/500
+                                                </span>
+                                            </div>
+                                            <textarea
+                                                value={formData.description}
+                                                onChange={(e) => handleInputChange('description', e.target.value)}
+                                                placeholder="Describe what this bot does..."
+                                                rows={3}
+                                                className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all resize-none ${errors.description ? 'border-red-500/50' : 'border-white/10'
+                                                    }`}
+                                            />
+                                            {errors.description && (
+                                                <p className="text-sm text-red-400 flex items-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    {errors.description}
+                                                </p>
+                                            )}
                                         </div>
-                                        <input
-                                            type="text"
-                                            value={formData.greeting}
-                                            onChange={(e) => handleInputChange('greeting', e.target.value)}
-                                            placeholder="Hello! How can I assist you today?"
-                                            className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all ${errors.greeting ? 'border-red-500/50' : 'border-white/10'
-                                                }`}
-                                        />
-                                        {errors.greeting && (
-                                            <p className="text-sm text-red-400 flex items-center gap-1">
-                                                <AlertCircle className="w-3 h-3" />
-                                                {errors.greeting}
-                                            </p>
-                                        )}
                                     </div>
-                                </div>
-                            </section>
+                                </section>
+                            )}
+
+                            {/* Tab 1: Voice Settings Section */}
+                            {activeTab === 1 && (
+                                <section>
+                                    <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
+                                        <Mic className="w-5 h-5 text-violet-400" />
+                                        Voice Settings
+                                    </h3>
+
+                                    <div className="space-y-4">
+                                        {/* Voice Type Cards */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-300">Voice Type</label>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                {voiceTypes.map((voice) => {
+                                                    const Icon = voice.icon;
+                                                    const isSelected = formData.voiceType === voice.value;
+                                                    return (
+                                                        <motion.button
+                                                            key={voice.value}
+                                                            whileHover={{ scale: 1.02 }}
+                                                            whileTap={{ scale: 0.98 }}
+                                                            onClick={() => handleInputChange('voiceType', voice.value)}
+                                                            className={`relative p-4 rounded-xl border transition-all ${isSelected
+                                                                ? 'bg-violet-500/10 border-violet-500/50 shadow-lg shadow-violet-500/10'
+                                                                : 'bg-zinc-900/50 border-white/10 hover:border-white/20'
+                                                                }`}
+                                                        >
+                                                            {isSelected && (
+                                                                <div className="absolute top-2 right-2">
+                                                                    <Check className="w-4 h-4 text-violet-400" />
+                                                                </div>
+                                                            )}
+                                                            <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-violet-400' : 'text-zinc-400'}`} />
+                                                            <p className={`text-sm font-medium ${isSelected ? 'text-zinc-100' : 'text-zinc-300'}`}>
+                                                                {voice.label}
+                                                            </p>
+                                                            <p className="text-xs text-zinc-500 mt-1">{voice.description}</p>
+                                                        </motion.button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        {/* Personality Dropdown */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-300">Personality</label>
+                                            <div className="relative">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPersonalityDropdown(!showPersonalityDropdown)}
+                                                    className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition-all"
+                                                >
+                                                    <span className="flex items-center gap-3">
+                                                        <span className={`w-3 h-3 rounded-full bg-gradient-to-r ${personalities.find(p => p.value === formData.personality)?.color
+                                                            }`} />
+                                                        {personalities.find(p => p.value === formData.personality)?.label}
+                                                    </span>
+                                                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${showPersonalityDropdown ? 'rotate-180' : ''}`} />
+                                                </button>
+
+                                                <AnimatePresence>
+                                                    {showPersonalityDropdown && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            className="absolute z-20 w-full mt-2 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-xl"
+                                                        >
+                                                            {personalities.map((personality) => (
+                                                                <button
+                                                                    key={personality.value}
+                                                                    onClick={() => {
+                                                                        handleInputChange('personality', personality.value);
+                                                                        setShowPersonalityDropdown(false);
+                                                                    }}
+                                                                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 transition-colors ${formData.personality === personality.value ? 'bg-zinc-800' : ''
+                                                                        }`}
+                                                                >
+                                                                    <span className={`w-3 h-3 rounded-full bg-gradient-to-r ${personality.color}`} />
+                                                                    <span className="text-zinc-100">{personality.label}</span>
+                                                                    {formData.personality === personality.value && (
+                                                                        <Check className="w-4 h-4 text-violet-400 ml-auto" />
+                                                                    )}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Tab 2: Script Flow Section */}
+                            {activeTab === 2 && (
+                                <section>
+                                    <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
+                                        <FileText className="w-5 h-5 text-violet-400" />
+                                        Script Flow
+                                    </h3>
+                                    <ScriptBuilder
+                                        questions={formData.scriptFlow}
+                                        setQuestions={(flow) => handleInputChange('scriptFlow', flow)}
+                                    />
+                                </section>
+                            )}
+
+                            {/* Tab 3: AI Behavior Section */}
+                            {activeTab === 3 && (
+                                <section>
+                                    <h3 className="flex items-center gap-2 text-lg font-medium text-zinc-100 mb-4">
+                                        <Brain className="w-5 h-5 text-violet-400" />
+                                        AI Behavior
+                                    </h3>
+
+                                    <div className="space-y-4">
+                                        {/* System Prompt */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-sm font-medium text-zinc-300">System Prompt</label>
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`text-xs ${formData.systemPrompt.length > 5000 ? 'text-red-400' : 'text-zinc-500'}`}>
+                                                        {formData.systemPrompt.length}/5000
+                                                    </span>
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                        onClick={handleGeneratePrompt}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 border border-violet-500/30 rounded-lg text-xs font-medium text-violet-300 hover:from-violet-600/30 hover:to-fuchsia-600/30 transition-colors"
+                                                    >
+                                                        <Wand2 className="w-3 h-3" />
+                                                        Generate with AI
+                                                    </motion.button>
+                                                </div>
+                                            </div>
+                                            <div className="relative">
+                                                <textarea
+                                                    value={formData.systemPrompt}
+                                                    onChange={(e) => handleInputChange('systemPrompt', e.target.value)}
+                                                    placeholder="You are a helpful AI assistant specialized in..."
+                                                    rows={8}
+                                                    className={`w-full px-4 py-3 bg-zinc-900 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all resize-none font-mono text-sm ${errors.systemPrompt ? 'border-red-500/50' : 'border-white/10'
+                                                        }`}
+                                                />
+                                                {/* Code editor style line numbers visual hint */}
+                                                <div className="absolute left-0 top-0 bottom-0 w-10 bg-zinc-950/50 rounded-l-xl pointer-events-none border-r border-white/5" />
+                                            </div>
+                                            {errors.systemPrompt && (
+                                                <p className="text-sm text-red-400 flex items-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    {errors.systemPrompt}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Greeting */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+                                                    <MessageSquare className="w-4 h-4 text-zinc-500" />
+                                                    Greeting Message
+                                                </label>
+                                                <span className={`text-xs ${formData.greeting.length > 500 ? 'text-red-400' : 'text-zinc-500'}`}>
+                                                    {formData.greeting.length}/500
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formData.greeting}
+                                                onChange={(e) => handleInputChange('greeting', e.target.value)}
+                                                placeholder="Hello! How can I assist you today?"
+                                                className={`w-full px-4 py-3 bg-zinc-900/50 border rounded-xl text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all ${errors.greeting ? 'border-red-500/50' : 'border-white/10'
+                                                    }`}
+                                            />
+                                            {errors.greeting && (
+                                                <p className="text-sm text-red-400 flex items-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    {errors.greeting}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </section>
+                            )}
 
                             {/* Submit Error */}
                             {errors.submit && (
@@ -466,7 +517,7 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                     </div>
                 </motion.div>
             </motion.div>
-        </AnimatePresence>
+        </AnimatePresence >
     );
 };
 

@@ -41,6 +41,24 @@ const BotSchema = new mongoose.Schema({
     enum: ['professional', 'friendly', 'casual', 'formal'],
     default: 'professional'
   },
+  // Script-based flow for question/answer bots
+  scriptFlow: [{
+    key: { type: String, required: true },
+    text: { type: String, required: true },
+    hints: { type: String, default: '' },
+    is_question: { type: Boolean, required: true }
+  }],
+  // Unique slug for script identification (auto-generated)
+  slug: { 
+    type: String, 
+    unique: true, 
+    sparse: true 
+  },
+  // Track if audio files have been generated
+  hasAudioGenerated: { 
+    type: Boolean, 
+    default: false 
+  },
   isActive: {
     type: Boolean,
     default: true
@@ -55,7 +73,21 @@ const BotSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Auto-generate slug from name before saving
+BotSchema.pre('save', function(next) {
+  if (this.isModified('name') && !this.slug) {
+    // Create slug: lowercase, replace spaces with underscores, add random suffix
+    const baseSlug = this.name.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    this.slug = `${baseSlug}_${randomSuffix}`;
+  }
+  next();
+});
+
 // Index for faster queries
 BotSchema.index({ user: 1, createdAt: -1 });
+BotSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Bot', BotSchema);

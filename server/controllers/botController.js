@@ -6,7 +6,7 @@ const { HTTP_STATUS, MESSAGES } = require('../config/constants');
 // @access  Private
 exports.createBot = async (req, res, next) => {
   try {
-    const { name, description, voiceType, language, systemPrompt, greeting, personality } = req.body;
+    const { name, description, voiceType, language, systemPrompt, greeting, personality, scriptFlow } = req.body;
     
     const bot = await Bot.create({
       user: req.user.id,
@@ -16,7 +16,8 @@ exports.createBot = async (req, res, next) => {
       language,
       systemPrompt,
       greeting,
-      personality
+      personality,
+      scriptFlow: scriptFlow || []
     });
 
     res.status(HTTP_STATUS.CREATED).json({
@@ -74,7 +75,7 @@ exports.getBot = async (req, res, next) => {
 // @access  Private
 exports.updateBot = async (req, res, next) => {
   try {
-    const { name, description, voiceType, language, systemPrompt, greeting, personality, isActive } = req.body;
+    const { name, description, voiceType, language, systemPrompt, greeting, personality, isActive, scriptFlow } = req.body;
     
     let bot = await Bot.findOne({ _id: req.params.id, user: req.user.id });
 
@@ -85,9 +86,15 @@ exports.updateBot = async (req, res, next) => {
       });
     }
 
+    const updateData = { name, description, voiceType, language, systemPrompt, greeting, personality, isActive };
+    if (scriptFlow !== undefined) {
+      updateData.scriptFlow = scriptFlow;
+      updateData.hasAudioGenerated = false; // Reset audio flag when script changes
+    }
+
     bot = await Bot.findByIdAndUpdate(
       req.params.id,
-      { name, description, voiceType, language, systemPrompt, greeting, personality, isActive },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -154,3 +161,160 @@ exports.getDashboardStats = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Trigger a call for a bot
+// @route   POST /api/bots/:id/trigger-call
+// @access  Private
+exports.triggerCall = async (req, res, next) => {
+  try {
+    const { phoneNumber } = req.body;
+    const { id } = req.params;
+
+    if (!phoneNumber) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: 'Phone number is required'
+      });
+    }
+
+    // Get bot and verify ownership
+    const bot = await Bot.findOne({ _id: id, user: req.user.id });
+    if (!bot) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        success: false,
+        message: MESSAGES.BOT.NOT_FOUND
+      });
+    }
+
+    // Get user with Twilio config
+    const User = require('../models/User');
+    const user = await User.findById(req.user.id);
+    
+    if (!user.twilioConfig.isConfigured) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: 'Please configure your Twilio credentials in Settings first'
+      });
+    }
+
+    // Check if bot has script flow
+    if (!bot.scriptFlow || bot.scriptFlow.length === 0) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: 'Bot must have a script flow to make calls'
+      });
+    }
+
+    // Call Python callEngine API to trigger call
+    const axios = require('axios');
+    const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+    
+    try {
+      const response = await axios.post(`${CALLENGINE_URL}/calls/trigger`, {
+        phone_number: phoneNumber,
+        script_slug: bot.slug,
+        twilio_account_sid: user.twilioConfig.accountSid,
+        twilio_auth_token: user.twilioConfig.authToken,
+        twilio_phone: user.twilioConfig.phoneNumber,
+        script_data: {
+          slug: bot.slug,
+          name: bot.name,
+          language: bot.language,
+          voice_type: bot.voiceType,
+          flow: bot.scriptFlow
+        }
+      });
+
+      // Create call log
+      const CallLog = require('../models/CallLog');
+      await CallLog.create({
+        user: req.user.id,
+        bot: bot._id,
+        phoneNumber,
+        direction: 'outbound',
+        status: 'queued',
+        twilioCallSid: response.data.call_sid
+      });
+
+      // Update bot stats
+      bot.stats.totalCalls += 1;
+      await bot.save();
+
+      res.status(HTTP_STATUS.OK).json({
+        success: true,
+        message: 'Call triggered successfully',
+        data: {
+          callSid: response.data.call_sid,
+          status: 'queued'
+        }
+      });
+    } catch (error) {
+      console.error('CallEngine API error:', error.response?.data || error.message);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to trigger call. Please ensure CallEngine is running.'
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Generate audio files for bot script
+// @route   POST /api/bots/:id/generate-audio
+// @access  Private
+exports.generateAudio = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Get bot and verify ownership
+    const bot = await Bot.findOne({ _id: id, user: req.user.id });
+    if (!bot) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        success: false,
+        message: MESSAGES.BOT.NOT_FOUND
+      });
+    }
+
+    if (!bot.scriptFlow || bot.scriptFlow.length === 0) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: 'Bot must have a script flow to generate audio'
+      });
+    }
+
+    // Call Python callEngine API to generate audio
+    const axios = require('axios');
+    const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+    
+    try {
+      await axios.post(`${CALLENGINE_URL}/scripts/${bot.slug}/generate-audio`, {
+        script_data: {
+          slug: bot.slug,
+          language: bot.language,
+          voice_type: bot.voiceType,
+          flow: bot.scriptFlow
+        }
+      });
+
+      // Update bot
+      bot.hasAudioGenerated = true;
+      await bot.save();
+
+      res.status(HTTP_STATUS.OK).json({
+        success: true,
+        message: 'Audio files generated successfully',
+        data: { bot }
+      });
+    } catch (error) {
+      console.error('CallEngine API error:', error.response?.data || error.message);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to generate audio. Please ensure CallEngine is running.'
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
