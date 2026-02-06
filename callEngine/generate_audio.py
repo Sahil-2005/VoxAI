@@ -4,7 +4,12 @@ import asyncio
 import edge_tts
 import glob
 
-VOICE = "hi-IN-SwaraNeural"
+# For English bot, use English voice
+VOICE_MAP = {
+    "agrosathi": "hi-IN-SwaraNeural",  # Hindi voice
+    "projectmanager": "en-US-AriaNeural"  # English voice
+}
+
 BASE_STATIC_DIR = "app/static"
 SCRIPTS_DIR = "app/scripts"
 
@@ -29,6 +34,10 @@ async def generate_mp3s():
             print(f"❌ Skipping {script_file}: No 'slug' found.")
             continue
 
+        # Select appropriate voice based on script slug
+        voice = VOICE_MAP.get(slug, "en-US-AriaNeural")
+        print(f"   ↳ Using voice: {voice}")
+
         # Dynamic Folder Creation: app/static/agrosathi
         target_dir = os.path.join(BASE_STATIC_DIR, slug)
         os.makedirs(target_dir, exist_ok=True)
@@ -46,7 +55,7 @@ async def generate_mp3s():
 
             try:
                 print(f"     🎙️ Generating: {key}...")
-                communicate = edge_tts.Communicate(text, VOICE)
+                communicate = edge_tts.Communicate(text, voice)
                 await communicate.save(file_path)
             except Exception as e:
                 print(f"     ❌ Error generating {key}: {e}")
