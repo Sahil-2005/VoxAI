@@ -41,6 +41,24 @@ const BotSchema = new mongoose.Schema({
     enum: ['professional', 'friendly', 'casual', 'formal'],
     default: 'professional'
   },
+  // Script-based flow for question/answer bots
+  scriptFlow: [{
+    key: { type: String, required: true },
+    text: { type: String, required: true },
+    hints: { type: String, default: '' },
+    is_question: { type: Boolean, required: true }
+  }],
+  // Unique slug for script identification (auto-generated)
+  slug: { 
+    type: String, 
+    unique: true, 
+    sparse: true 
+  },
+  // Track if audio files have been generated
+  hasAudioGenerated: { 
+    type: Boolean, 
+    default: false 
+  },
   isActive: {
     type: Boolean,
     default: true
