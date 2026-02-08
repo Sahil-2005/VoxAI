@@ -146,7 +146,26 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     next_step = step + 1
 
     if next_step >= len(QUESTIONS):
-        # END OF CONVERSATION
+        # END OF CONVERSATION - Send webhook with all responses
+        from app.database import get_database
+        from app.utils.webhook import send_call_completion_webhook
+        
+        # Fetch all responses for this call
+        db = get_database()
+        call_data = None
+        if db is not None:
+            call_data = await db["calls"].find_one({"call_sid": call_id})
+        
+        # Send webhook to Node.js server
+        if call_data:
+            responses = call_data.get("answers", {})
+            await send_call_completion_webhook(
+                call_sid=call_id,
+                responses=responses,
+                status="completed"
+            )
+        
+        # Play outro and hangup
         outro_path = f"app/static/{script}/outro.mp3"
         if os.path.exists(outro_path):
             vr.play(f"{BASE_URL}/static/{script}/outro.mp3")

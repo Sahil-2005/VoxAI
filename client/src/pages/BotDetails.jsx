@@ -404,17 +404,28 @@ export default function BotDetails() {
                                                 ) : null}
                                             </div>
 
-                                            {/* Call Transcript/Responses */}
+                                            {/* Call Conversation */}
                                             {call.responses && Object.keys(call.responses).length > 0 && (
                                                 <div className="mt-3 pt-3 border-t border-white/5">
-                                                    <p className="text-xs text-zinc-500 mb-2">Responses:</p>
-                                                    <div className="space-y-1">
-                                                        {Object.entries(call.responses).map(([key, value]) => (
-                                                            <div key={key} className="text-sm">
-                                                                <span className="text-zinc-400">{key}:</span>
-                                                                <span className="text-zinc-200 ml-2">{value}</span>
-                                                            </div>
-                                                        ))}
+                                                    <p className="text-xs font-medium text-zinc-400 mb-3 flex items-center gap-1">
+                                                        <MessageSquare className="w-3 h-3" />
+                                                        Conversation ({Object.keys(call.responses).length} responses)
+                                                    </p>
+                                                    <div className="space-y-3">
+                                                        {Object.entries(call.responses).map(([key, value]) => {
+                                                            // Find the question text from script flow
+                                                            const question = bot.scriptFlow?.find(item => item.key === key);
+                                                            return (
+                                                                <div key={key} className="bg-zinc-900/50 p-3 rounded-lg">
+                                                                    <p className="text-xs text-violet-400 mb-1">
+                                                                        Q: {question?.text || key}
+                                                                    </p>
+                                                                    <p className="text-sm text-zinc-200">
+                                                                        A: {value}
+                                                                    </p>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                             )}
