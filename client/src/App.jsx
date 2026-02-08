@@ -92,22 +92,6 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/bots/create"
-          element={
-            <ProtectedRoute>
-              <PageWrapper><CreateBot /></PageWrapper>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/bots/edit/:id"
-          element={
-            <ProtectedRoute>
-              <PageWrapper><CreateBot /></PageWrapper>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/bots/:id"
           element={
             <ProtectedRoute>

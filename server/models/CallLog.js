@@ -42,6 +42,11 @@ const CallLogSchema = new mongoose.Schema({
     enum: ['positive', 'neutral', 'negative', 'unknown'],
     default: 'unknown'
   },
+  responses: {
+    type: Map,
+    of: String,
+    default: {}
+  },
   startedAt: {
     type: Date
   },

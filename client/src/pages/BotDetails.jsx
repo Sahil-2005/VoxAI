@@ -15,10 +15,14 @@ import {
     TrendingUp,
     FileText,
     Mic,
-    Loader2
+    Loader2,
+    MessageSquare,
+    CheckCircle,
+    XCircle
 } from 'lucide-react';
 import axios from 'axios';
 import TriggerCall from '../components/TriggerCall';
+import CreateBot from './CreateBot';
 
 const API_BASE = 'http://localhost:5000/api';
 const CALLENGINE_BASE = 'http://localhost:8000';
@@ -31,6 +35,9 @@ export default function BotDetails() {
     const [activeTab, setActiveTab] = useState(0);
     const [playingAudio, setPlayingAudio] = useState(null);
     const [audioElements, setAudioElements] = useState({});
+    const [callLogs, setCallLogs] = useState([]);
+    const [loadingLogs, setLoadingLogs] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         fetchBotDetails();
@@ -43,10 +50,28 @@ export default function BotDetails() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBot(response.data.data.bot);
+
+            // Fetch call logs
+            fetchCallLogs();
         } catch (error) {
             console.error('Error fetching bot:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchCallLogs = async () => {
+        try {
+            setLoadingLogs(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_BASE}/calls/bot/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCallLogs(response.data.data?.calls || []);
+        } catch (error) {
+            console.error('Error fetching call logs:', error);
+        } finally {
+            setLoadingLogs(false);
         }
     };
 
@@ -125,7 +150,7 @@ export default function BotDetails() {
                         </div>
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => navigate(`/bots/edit/${id}`)}
+                                onClick={() => setIsEditModalOpen(true)}
                                 className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 rounded-lg transition-colors flex items-center gap-2"
                             >
                                 <Edit className="w-4 h-4" />
@@ -146,13 +171,13 @@ export default function BotDetails() {
             {/* Tabs */}
             <div className="max-w-7xl mx-auto px-6 py-6">
                 <div className="flex gap-1 mb-6 border-b border-white/10">
-                    {['Overview', 'Script Flow', 'Audio Files', 'Test Call'].map((tab, index) => (
+                    {['Overview', 'Script Flow', 'Audio Files', 'Analytics', 'Test Call'].map((tab, index) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(index)}
                             className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === index
-                                    ? 'text-violet-400'
-                                    : 'text-zinc-400 hover:text-zinc-300'
+                                ? 'text-violet-400'
+                                : 'text-zinc-400 hover:text-zinc-300'
                                 }`}
                         >
                             {tab}
@@ -325,8 +350,89 @@ export default function BotDetails() {
                         </motion.div>
                     )}
 
-                    {/* Test Call Tab */}
+                    {/* Analytics Tab */}
                     {activeTab === 3 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-6 bg-zinc-900/50 border border-white/10 rounded-xl"
+                        >
+                            <h3 className="text-lg font-medium text-zinc-100 mb-4 flex items-center gap-2">
+                                <MessageSquare className="w-5 h-5 text-violet-400" />
+                                Call Analytics ({callLogs.length} calls)
+                            </h3>
+                            {loadingLogs ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
+                                </div>
+                            ) : callLogs.length > 0 ? (
+                                <div className="space-y-4">
+                                    {callLogs.map((call, index) => (
+                                        <div
+                                            key={call._id || index}
+                                            className="p-4 bg-zinc-800/50 border border-white/5 rounded-lg"
+                                        >
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-zinc-200 font-medium">
+                                                            {call.phoneNumber}
+                                                        </span>
+                                                        <span className={`px-2 py-0.5 rounded text-xs ${call.status === 'completed'
+                                                            ? 'bg-green-500/20 text-green-400'
+                                                            : call.status === 'failed'
+                                                                ? 'bg-red-500/20 text-red-400'
+                                                                : 'bg-yellow-500/20 text-yellow-400'
+                                                            }`}>
+                                                            {call.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-sm text-zinc-400">
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="w-3 h-3" />
+                                                            {call.duration ? `${call.duration}s` : 'N/A'}
+                                                        </span>
+                                                        <span>
+                                                            {new Date(call.createdAt).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {call.status === 'completed' ? (
+                                                    <CheckCircle className="w-5 h-5 text-green-400" />
+                                                ) : call.status === 'failed' ? (
+                                                    <XCircle className="w-5 h-5 text-red-400" />
+                                                ) : null}
+                                            </div>
+
+                                            {/* Call Transcript/Responses */}
+                                            {call.responses && Object.keys(call.responses).length > 0 && (
+                                                <div className="mt-3 pt-3 border-t border-white/5">
+                                                    <p className="text-xs text-zinc-500 mb-2">Responses:</p>
+                                                    <div className="space-y-1">
+                                                        {Object.entries(call.responses).map(([key, value]) => (
+                                                            <div key={key} className="text-sm">
+                                                                <span className="text-zinc-400">{key}:</span>
+                                                                <span className="text-zinc-200 ml-2">{value}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <MessageSquare className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+                                    <p className="text-zinc-400">No call logs yet</p>
+                                    <p className="text-sm text-zinc-500 mt-1">Make test calls to see analytics here</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+
+                    {/* Test Call Tab */}
+                    {activeTab === 4 && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -341,6 +447,17 @@ export default function BotDetails() {
                     )}
                 </div>
             </div>
+
+            {/* Edit Bot Modal */}
+            <CreateBot
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={() => {
+                    setIsEditModalOpen(false);
+                    fetchBotDetails(); // Refresh bot data
+                }}
+                editBot={bot}
+            />
         </div>
     );
 }
