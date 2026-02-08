@@ -51,6 +51,7 @@ async def trigger_call(request: CallTriggerRequest):
                 "name": request.script_data.name,
                 "language": request.script_data.language,
                 "voice_type": request.script_data.voice_type,
+                "recognition_language": getattr(request.script_data, 'recognition_language', 'en-US'),
                 "flow": [item.dict() for item in request.script_data.flow]
             }},
             upsert=True

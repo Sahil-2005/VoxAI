@@ -45,6 +45,7 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
         personality: 'professional',
         systemPrompt: '',
         greeting: 'Hello! How can I assist you today?',
+        recognitionLanguage: 'en-US',
         scriptFlow: []
     });
 
@@ -62,6 +63,7 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                 personality: editBot.personality || 'professional',
                 systemPrompt: editBot.systemPrompt || '',
                 greeting: editBot.greeting || 'Hello! How can I assist you today?',
+                recognitionLanguage: editBot.recognitionLanguage || 'en-US',
                 scriptFlow: editBot.scriptFlow || []
             });
         } else {
@@ -73,6 +75,7 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                 personality: 'professional',
                 systemPrompt: '',
                 greeting: 'Hello! How can I assist you today?',
+                recognitionLanguage: 'en-US',
                 scriptFlow: []
             });
         }
@@ -498,6 +501,26 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Recognition Language Dropdown */}
+                                    <div className="space-y-2 mt-6"> {/* Added mt-6 for spacing */}
+                                        <label className="text-sm font-medium text-zinc-300">Recognition Language</label>
+                                        <p className="text-xs text-zinc-500 mb-2">Language for speech-to-text (what language users speak in)</p>
+                                        <select
+                                            value={formData.recognitionLanguage}
+                                            onChange={(e) => handleInputChange('recognitionLanguage', e.target.value)}
+                                            className="w-full px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+                                        >
+                                            <option value="en-US">English (US)</option>
+                                            <option value="en-GB">English (UK)</option>
+                                            <option value="hi-IN">Hindi (India)</option>
+                                            <option value="es-ES">Spanish (Spain)</option>
+                                            <option value="fr-FR">French (France)</option>
+                                            <option value="de-DE">German (Germany)</option>
+                                            <option value="ja-JP">Japanese (Japan)</option>
+                                            <option value="zh-CN">Chinese (Simplified)</option>
+                                        </select>
+                                    </div>
                                 </section>
                             )}
 

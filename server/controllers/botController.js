@@ -263,6 +263,7 @@ exports.triggerCall = async (req, res, next) => {
           name: bot.name,
           language: bot.language,
           voice_type: bot.voiceType,
+          recognition_language: bot.recognitionLanguage || 'en-US',
           flow: bot.scriptFlow
         }
       });
