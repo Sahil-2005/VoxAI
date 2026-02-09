@@ -6,7 +6,7 @@ const { HTTP_STATUS, MESSAGES } = require('../config/constants');
 // @access  Private
 exports.createBot = async (req, res, next) => {
   try {
-    const { name, description, voiceType, language, systemPrompt, greeting, personality, scriptFlow } = req.body;
+    const { name, description, voiceType, language, recognitionLanguage, systemPrompt, greeting, personality, scriptFlow } = req.body;
     
     // Generate slug from name
     const baseSlug = name.toLowerCase()
@@ -21,6 +21,7 @@ exports.createBot = async (req, res, next) => {
       description,
       voiceType,
       language,
+      recognitionLanguage,
       systemPrompt,
       greeting,
       personality,
@@ -92,13 +93,14 @@ exports.updateBot = async (req, res, next) => {
       });
     }
 
-    const { name, description, voiceType, language, systemPrompt, greeting, personality, scriptFlow, isActive } = req.body;
+    const { name, description, voiceType, language, recognitionLanguage, systemPrompt, greeting, personality, scriptFlow, isActive } = req.body;
 
     const updateData = {
       name,
       description,
       voiceType,
       language,
+      recognitionLanguage,
       systemPrompt,
       greeting,
       personality,

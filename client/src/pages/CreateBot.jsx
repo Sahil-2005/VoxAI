@@ -134,6 +134,8 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
+            console.log('Submitting bot data:', formData);
+
             if (editBot) {
                 await axios.put(`${API_BASE}/bots/${editBot._id}`, formData, { headers });
             } else {
@@ -378,6 +380,46 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                                                 </AnimatePresence>
                                             </div>
                                         </div>
+
+                                        {/* Bot Language Dropdown */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-300">Bot Language</label>
+                                            <p className="text-xs text-zinc-500 mb-2">Language the bot speaks in (text-to-speech)</p>
+                                            <select
+                                                value={formData.language}
+                                                onChange={(e) => handleInputChange('language', e.target.value)}
+                                                className="w-full px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+                                            >
+                                                <option value="en-US">English (US)</option>
+                                                <option value="en-GB">English (UK)</option>
+                                                <option value="hi-IN">Hindi (India)</option>
+                                                <option value="es-ES">Spanish (Spain)</option>
+                                                <option value="fr-FR">French (France)</option>
+                                                <option value="de-DE">German (Germany)</option>
+                                                <option value="ja-JP">Japanese (Japan)</option>
+                                                <option value="zh-CN">Chinese (Simplified)</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Recognition Language Dropdown */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-300">Recognition Language</label>
+                                            <p className="text-xs text-zinc-500 mb-2">Language for speech-to-text (what language users speak in)</p>
+                                            <select
+                                                value={formData.recognitionLanguage}
+                                                onChange={(e) => handleInputChange('recognitionLanguage', e.target.value)}
+                                                className="w-full px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+                                            >
+                                                <option value="en-US">English (US)</option>
+                                                <option value="en-GB">English (UK)</option>
+                                                <option value="hi-IN">Hindi (India)</option>
+                                                <option value="es-ES">Spanish (Spain)</option>
+                                                <option value="fr-FR">French (France)</option>
+                                                <option value="de-DE">German (Germany)</option>
+                                                <option value="ja-JP">Japanese (Japan)</option>
+                                                <option value="zh-CN">Chinese (Simplified)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </section>
                             )}
@@ -501,26 +543,6 @@ const CreateBot = ({ isOpen, onClose, onSuccess, editBot = null }) => {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* Recognition Language Dropdown */}
-                                    <div className="space-y-2 mt-6"> {/* Added mt-6 for spacing */}
-                                        <label className="text-sm font-medium text-zinc-300">Recognition Language</label>
-                                        <p className="text-xs text-zinc-500 mb-2">Language for speech-to-text (what language users speak in)</p>
-                                        <select
-                                            value={formData.recognitionLanguage}
-                                            onChange={(e) => handleInputChange('recognitionLanguage', e.target.value)}
-                                            className="w-full px-4 py-3 bg-zinc-900/50 border border-white/10 rounded-xl text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
-                                        >
-                                            <option value="en-US">English (US)</option>
-                                            <option value="en-GB">English (UK)</option>
-                                            <option value="hi-IN">Hindi (India)</option>
-                                            <option value="es-ES">Spanish (Spain)</option>
-                                            <option value="fr-FR">French (France)</option>
-                                            <option value="de-DE">German (Germany)</option>
-                                            <option value="ja-JP">Japanese (Japan)</option>
-                                            <option value="zh-CN">Chinese (Simplified)</option>
-                                        </select>
-                                    </div>
                                 </section>
                             )}
 

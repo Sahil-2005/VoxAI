@@ -92,18 +92,58 @@ async def generate_audio_for_script(slug: str, request: AudioGenerationRequest):
         import asyncio
         import edge_tts
         
-        # Voice mapping
+        # Comprehensive voice mapping for multiple languages
+        # Format: language_code -> {voice_type -> voice_name}
         VOICE_MAP = {
-            "male": "en-US-GuyNeural",
-            "female": "en-US-AriaNeural",
-            "neutral": "en-US-JennyNeural"
+            "en-US": {
+                "male": "en-US-GuyNeural",
+                "female": "en-US-AriaNeural",
+                "neutral": "en-US-JennyNeural"
+            },
+            "en-GB": {
+                "male": "en-GB-RyanNeural",
+                "female": "en-GB-SoniaNeural",
+                "neutral": "en-GB-LibbyNeural"
+            },
+            "hi-IN": {
+                "male": "hi-IN-MadhurNeural",
+                "female": "hi-IN-SwaraNeural",
+                "neutral": "hi-IN-SwaraNeural"
+            },
+            "es-ES": {
+                "male": "es-ES-AlvaroNeural",
+                "female": "es-ES-ElviraNeural",
+                "neutral": "es-ES-ElviraNeural"
+            },
+            "fr-FR": {
+                "male": "fr-FR-HenriNeural",
+                "female": "fr-FR-DeniseNeural",
+                "neutral": "fr-FR-DeniseNeural"
+            },
+            "de-DE": {
+                "male": "de-DE-ConradNeural",
+                "female": "de-DE-KatjaNeural",
+                "neutral": "de-DE-KatjaNeural"
+            },
+            "ja-JP": {
+                "male": "ja-JP-KeitaNeural",
+                "female": "ja-JP-NanamiNeural",
+                "neutral": "ja-JP-NanamiNeural"
+            },
+            "zh-CN": {
+                "male": "zh-CN-YunxiNeural",
+                "female": "zh-CN-XiaoxiaoNeural",
+                "neutral": "zh-CN-XiaoxiaoNeural"
+            }
         }
         
-        # Get voice based on language and voice type
-        if request.script_data.language.startswith("hi"):
-            voice = "hi-IN-SwaraNeural"
-        else:
-            voice = VOICE_MAP.get(request.script_data.voice_type, "en-US-AriaNeural")
+        # Get language and voice type
+        language = request.script_data.language or "en-US"
+        voice_type = request.script_data.voice_type or "female"
+        
+        # Get voice from mapping, fallback to English if language not found
+        language_voices = VOICE_MAP.get(language, VOICE_MAP["en-US"])
+        voice = language_voices.get(voice_type, language_voices.get("female"))
         
         # Create target directory
         target_dir = f"app/static/{slug}"

@@ -18,7 +18,8 @@ import {
     Loader2,
     MessageSquare,
     CheckCircle,
-    XCircle
+    XCircle,
+    RefreshCw
 } from 'lucide-react';
 import axios from 'axios';
 import TriggerCall from '../components/TriggerCall';
@@ -149,6 +150,17 @@ export default function BotDetails() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    setLoading(true);
+                                    fetchBotDetails();
+                                }}
+                                disabled={loading}
+                                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                                Refresh
+                            </button>
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
                                 className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 rounded-lg transition-colors flex items-center gap-2"
