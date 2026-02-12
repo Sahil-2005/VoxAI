@@ -6,7 +6,7 @@ const { HTTP_STATUS, MESSAGES } = require('../config/constants');
 // @access  Private
 exports.createBot = async (req, res, next) => {
   try {
-    const { name, description, voiceType, language, systemPrompt, greeting, personality, scriptFlow } = req.body;
+    const { name, description, voiceType, language, recognitionLanguage, systemPrompt, greeting, personality, scriptFlow } = req.body;
     
     // Generate slug from name
     const baseSlug = name.toLowerCase()
@@ -21,6 +21,7 @@ exports.createBot = async (req, res, next) => {
       description,
       voiceType,
       language,
+      recognitionLanguage,
       systemPrompt,
       greeting,
       personality,
@@ -83,8 +84,6 @@ exports.getBot = async (req, res, next) => {
 // @access  Private
 exports.updateBot = async (req, res, next) => {
   try {
-    const { name, description, voiceType, language, systemPrompt, greeting, personality, isActive, scriptFlow } = req.body;
-    
     let bot = await Bot.findOne({ _id: req.params.id, user: req.user.id });
 
     if (!bot) {
@@ -94,8 +93,45 @@ exports.updateBot = async (req, res, next) => {
       });
     }
 
-    const updateData = { name, description, voiceType, language, systemPrompt, greeting, personality, isActive };
+    const { name, description, voiceType, language, recognitionLanguage, systemPrompt, greeting, personality, scriptFlow, isActive } = req.body;
+
+    const updateData = {
+      name,
+      description,
+      voiceType,
+      language,
+      recognitionLanguage,
+      systemPrompt,
+      greeting,
+      personality,
+      isActive // isActive is still a direct update field
+    };
+
+    // Handle script flow updates and audio deletion
     if (scriptFlow !== undefined) {
+      const oldKeys = new Set(bot.scriptFlow.filter(item => item.is_question).map(item => item.key));
+      const newKeys = new Set(scriptFlow.filter(item => item.is_question).map(item => item.key));
+      
+      // Find removed question keys
+      const removedKeys = [...oldKeys].filter(key => !newKeys.has(key));
+      
+      // Delete audio files for removed questions
+      if (removedKeys.length > 0 && bot.slug) {
+        try {
+          const axios = require('axios');
+          const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+          
+          await axios.post(`${CALLENGINE_URL}/calls/${bot.slug}/delete-audio`, {
+            keys: removedKeys
+          });
+          
+          console.log(`Deleted audio files for keys: ${removedKeys.join(', ')}`);
+        } catch (error) {
+          console.error('Error deleting audio files:', error.message);
+          // Continue with update even if audio deletion fails
+        }
+      }
+      
       updateData.scriptFlow = scriptFlow;
       updateData.hasAudioGenerated = false; // Reset audio flag when script changes
     }
@@ -229,6 +265,7 @@ exports.triggerCall = async (req, res, next) => {
           name: bot.name,
           language: bot.language,
           voice_type: bot.voiceType,
+          recognition_language: bot.recognitionLanguage || 'en-US',
           flow: bot.scriptFlow
         }
       });

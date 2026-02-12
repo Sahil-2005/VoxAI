@@ -57,6 +57,15 @@ VoiceAgent/
 - MongoDB (local or Atlas)
 - Twilio Account (optional, for calls)
 
+### Twilio Setup (Important)
+
+To enable voice capabilities, you need to configure Twilio:
+
+1.  **Sign Up**: Create a free account at [Twilio](https://www.twilio.com/try-twilio).
+2.  **Get a Number**: Buy a phone number with Voice capabilities (free with trial credit).
+3.  **Credentials**: Get your `Account SID` and `Auth Token` from the console.
+4.  **Verified Caller IDs**: If using a **Free Trial Account**, you must verify any phone number you wish to call in the [Verified Caller IDs](https://console.twilio.com/us1/develop/phone-numbers/manage/verified) section. Calls to unverified numbers will fail on trial accounts.
+
 ### Installation
 
 1. **Clone the repository**

@@ -6,11 +6,8 @@ import {
     User,
     Mic,
     Edit3,
-    Trash2,
     Phone,
-    MoreVertical,
-    TrendingUp,
-    Power
+    TrendingUp
 } from 'lucide-react';
 
 const voiceIcons = {
@@ -81,7 +78,6 @@ const BotCard = ({
     onToggleActive
 }) => {
     const navigate = useNavigate();
-    const [showMenu, setShowMenu] = useState(false);
     const [isToggling, setIsToggling] = useState(false);
 
     const VoiceIcon = voiceIcons[bot.voiceType] || Mic;
@@ -133,73 +129,20 @@ const BotCard = ({
                             </p>
                         </div>
                     </div>
-
-                    {/* Menu Button */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setShowMenu(!showMenu)}
-                            className="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-lg transition-colors"
-                        >
-                            <MoreVertical className="w-4 h-4" />
-                        </button>
-
-                        {/* Dropdown Menu */}
-                        {showMenu && (
-                            <>
-                                <div
-                                    className="fixed inset-0 z-10"
-                                    onClick={() => setShowMenu(false)}
-                                />
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="absolute right-0 top-full mt-1 z-20 w-40 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-xl"
-                                >
-                                    <button
-                                        onClick={() => {
-                                            onEdit?.(bot);
-                                            setShowMenu(false);
-                                        }}
-                                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
-                                    >
-                                        <Edit3 className="w-4 h-4" />
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            onTestCall?.(bot);
-                                            setShowMenu(false);
-                                        }}
-                                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
-                                    >
-                                        <Phone className="w-4 h-4" />
-                                        Test Call
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            onDelete?.(bot._id);
-                                            setShowMenu(false);
-                                        }}
-                                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        Delete
-                                    </button>
-                                </motion.div>
-                            </>
-                        )}
-                    </div>
                 </div>
 
-                {/* Voice & Personality Tags */}
+                {/* Status Badge */}
                 <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800/50 rounded-lg">
-                        <VoiceIcon className="w-3.5 h-3.5 text-zinc-400" />
-                        <span className="text-xs text-zinc-300 capitalize">{bot.voiceType}</span>
+                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${bot.isActive
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-zinc-800/50 text-zinc-500 border border-zinc-700/50'
+                        }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${bot.isActive ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-500'}`} />
+                        <span className="text-xs font-medium">{bot.isActive ? 'Active' : 'Inactive'}</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r ${personalityGradient} bg-opacity-10 rounded-lg`}>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 border border-violet-500/20">
                         <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${personalityGradient}`} />
-                        <span className="text-xs text-zinc-300 capitalize">{bot.personality}</span>
+                        <span className="text-xs font-medium capitalize">{bot.personality || 'Professional'}</span>
                     </div>
                 </div>
 
@@ -241,37 +184,6 @@ const BotCard = ({
                             {bot.isActive ? 'Active' : 'Inactive'}
                         </span>
                     </button>
-
-                    {/* Quick Actions */}
-                    <div className="flex items-center gap-1">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onTestCall?.(bot)}
-                            className="p-2 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
-                            title="Test Call"
-                        >
-                            <Phone className="w-4 h-4" />
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onEdit?.(bot)}
-                            className="p-2 text-zinc-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
-                            title="Edit"
-                        >
-                            <Edit3 className="w-4 h-4" />
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onDelete?.(bot._id)}
-                            className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                            title="Delete"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </motion.button>
-                    </div>
                 </div>
             </div>
         </motion.div>

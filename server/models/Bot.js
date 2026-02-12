@@ -26,6 +26,11 @@ const BotSchema = new mongoose.Schema({
     type: String,
     default: 'en-US'
   },
+  recognitionLanguage: {
+    type: String,
+    default: 'en-US',
+    enum: ['en-US', 'en-GB', 'hi-IN', 'es-ES', 'fr-FR', 'de-DE', 'ja-JP', 'zh-CN']
+  },
   systemPrompt: {
     type: String,
     required: [true, 'System prompt is required'],

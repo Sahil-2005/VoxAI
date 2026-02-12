@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
@@ -129,6 +130,26 @@ const TriggerCall = ({ botId, botName, hasScriptFlow, hasAudioGenerated }) => {
                 </div>
 
                 <div className="space-y-4">
+                    {/* Warning for Free Accounts */}
+                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                        <div className="flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-amber-300">Using a Free Twilio Account?</p>
+                                <p className="text-xs text-amber-400/80 mt-1 leading-relaxed">
+                                    Free trial accounts can <strong className="text-amber-300">only call verified numbers</strong>.
+                                    If the call fails immediately, check if the number is verified.
+                                </p>
+                                <Link
+                                    to="/twilio-guide"
+                                    className="inline-flex items-center gap-1 text-xs text-amber-300 underline mt-2 hover:text-amber-200"
+                                >
+                                    View Setup Guide & Get Credentials
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Phone Number Input */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-zinc-300">Phone Number</label>
@@ -171,8 +192,8 @@ const TriggerCall = ({ botId, botName, hasScriptFlow, hasAudioGenerated }) => {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             className={`flex items-start gap-3 p-4 rounded-xl ${status.type === 'success'
-                                    ? 'bg-emerald-500/10 border border-emerald-500/20'
-                                    : 'bg-red-500/10 border border-red-500/20'
+                                ? 'bg-emerald-500/10 border border-emerald-500/20'
+                                : 'bg-red-500/10 border border-red-500/20'
                                 }`}
                         >
                             {status.type === 'success' ? (

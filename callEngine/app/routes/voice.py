@@ -99,9 +99,11 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     if not script_data and script not in SCRIPTS_CACHE:
         load_scripts()
     
-    # Get questions
+    # Get questions and recognition language
+    recognition_language = "en-US"  # Default
     if script_data:
         QUESTIONS = [item for item in script_data.get("flow", []) if item.get("is_question")]
+        recognition_language = script_data.get("recognition_language", "en-US")
     elif script in SCRIPTS_CACHE:
         QUESTIONS = SCRIPTS_CACHE[script]["questions"]
     else:
@@ -111,7 +113,7 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     # --- HANDLE START ---
     if step == -1:
         # User pressed start button. Move immediately to Q1 (Index 0)
-        return await ask_question(vr, 0, 0, script, QUESTIONS)
+        return await ask_question(vr, 0, 0, script, QUESTIONS, recognition_language)
 
     # --- VALIDATE INPUT ---
     user_input = speech or digits or ""
@@ -133,7 +135,7 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
             vr.play(f"{BASE_URL}/static/{script}/error.mp3")
         else:
             vr.say("Sorry, I didn't catch that. Please try again.", voice="Polly.Joanna", language="en-US")
-        return await ask_question(vr, step, retry + 1, script, QUESTIONS)
+        return await ask_question(vr, step, retry + 1, script, QUESTIONS, recognition_language)
 
     # ✅ SAVE ANSWER TO DB
     if 0 <= step < len(QUESTIONS):
@@ -146,7 +148,26 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
     next_step = step + 1
 
     if next_step >= len(QUESTIONS):
-        # END OF CONVERSATION
+        # END OF CONVERSATION - Send webhook with all responses
+        from app.database import get_database
+        from app.utils.webhook import send_call_completion_webhook
+        
+        # Fetch all responses for this call
+        db = get_database()
+        call_data = None
+        if db is not None:
+            call_data = await db["calls"].find_one({"call_sid": call_id})
+        
+        # Send webhook to Node.js server
+        if call_data:
+            responses = call_data.get("answers", {})
+            await send_call_completion_webhook(
+                call_sid=call_id,
+                responses=responses,
+                status="completed"
+            )
+        
+        # Play outro and hangup
         outro_path = f"app/static/{script}/outro.mp3"
         if os.path.exists(outro_path):
             vr.play(f"{BASE_URL}/static/{script}/outro.mp3")
@@ -155,10 +176,10 @@ async def handle_answer(request: Request, step: int, retry: int = 0, script: str
         vr.hangup()
         return Response(str(vr), media_type="application/xml")
 
-    return await ask_question(vr, next_step, 0, script, QUESTIONS)
+    return await ask_question(vr, next_step, 0, script, QUESTIONS, recognition_language)
 
 
-async def ask_question(vr, step_index, retry, script_slug, questions_list):
+async def ask_question(vr, step_index, retry, script_slug, questions_list, recognition_language="en-US"):
     question_data = questions_list[step_index]
     key = question_data["key"]
     
@@ -172,7 +193,7 @@ async def ask_question(vr, step_index, retry, script_slug, questions_list):
     gather = Gather(
         input="dtmf speech",
         action=f"/voice/answer?step={step_index}&retry={retry}&script={script_slug}",
-        language="hi-IN",
+        language=recognition_language,  # Use dynamic language
         timeout=4,
         hints=hint_text,      
         enhanced=True,        
