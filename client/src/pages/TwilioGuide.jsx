@@ -93,7 +93,7 @@ export default function TwilioGuide() {
                         </p>
                         <ol className="list-decimal list-inside space-y-3 text-zinc-300 ml-2">
                             <li>Go to the <span className="text-violet-300">Phone Numbers</span> section in the console.</li>
-                            <li>Click on <span className="text-violet-300">Manage</span> > <span className="text-violet-300">Buy a number</span>.</li>
+                            <li>Click on <span className="text-violet-300">Manage</span>  <span className="text-violet-300">Buy a number</span>.</li>
                             <li>Search for a number with <strong>Voice</strong> capabilities.</li>
                             <li>Click <span className="text-violet-300">Buy</span> (uses trial credit).</li>
                         </ol>
@@ -160,7 +160,7 @@ export default function TwilioGuide() {
                             To call a number during your trial, you must first verify it.
                         </p>
                         <ol className="list-decimal list-inside space-y-3 text-zinc-300 ml-2">
-                            <li>Go to <span className="text-violet-300">Phone Numbers</span> > <span className="text-violet-300">Manage</span> > <span className="text-violet-300">Verified Caller IDs</span>.</li>
+                            <li>Go to <span className="text-violet-300">Phone Numbers</span> <span className="text-violet-300">Manage</span> <span className="text-violet-300">Verified Caller IDs</span>.</li>
                             <li>Click <span className="text-violet-300">Add a new Caller ID</span>.</li>
                             <li>Enter the phone number you want to call (e.g., your personal mobile number).</li>
                             <li>Verify it via SMS or Call.</li>
