@@ -15,13 +15,15 @@ import {
     User,
     Bell,
     Search,
-    Crown
+    Crown,
+    Phone
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/settings', icon: Settings, label: 'Settings' }
+    { path: '/settings', icon: Settings, label: 'Settings' },
+    { path: '/twilio-guide', icon: Phone, label: 'Twilio Guide' }
 ];
 
 const DashboardLayout = ({ children }) => {

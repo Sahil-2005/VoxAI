@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import CreateBot from './pages/CreateBot';
 import BotDetails from './pages/BotDetails';
 import Settings from './pages/Settings';
+import TwilioGuide from './pages/TwilioGuide';
 
 import './App.css';
 
@@ -101,11 +102,21 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/twilio-guide"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PageWrapper><TwilioGuide /></PageWrapper>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AnimatePresence>
+    </AnimatePresence >
   );
 };
 
