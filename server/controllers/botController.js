@@ -119,7 +119,7 @@ exports.updateBot = async (req, res, next) => {
       if (removedKeys.length > 0 && bot.slug) {
         try {
           const axios = require('axios');
-          const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+          const CALLENGINE_URL = process.env.CALLENGINE_URL;
           
           await axios.post(`${CALLENGINE_URL}/calls/${bot.slug}/delete-audio`, {
             keys: removedKeys
@@ -251,7 +251,7 @@ exports.triggerCall = async (req, res, next) => {
 
     // Call Python callEngine API to trigger call
     const axios = require('axios');
-    const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+    const CALLENGINE_URL = process.env.CALLENGINE_URL;
     
     try {
       const response = await axios.post(`${CALLENGINE_URL}/calls/trigger`, {
@@ -330,7 +330,7 @@ exports.generateAudio = async (req, res, next) => {
 
     // Call Python callEngine API to generate audio
     const axios = require('axios');
-    const CALLENGINE_URL = process.env.CALLENGINE_URL || 'http://localhost:8000';
+    const CALLENGINE_URL = process.env.CALLENGINE_URL;
     
     try {
       const response = await axios.post(`${CALLENGINE_URL}/calls/${bot.slug}/generate-audio`, {
