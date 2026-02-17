@@ -26,6 +26,19 @@ app.use(cors({
   origin: process.env.CLIENT_URL, // ⚠️ MAKE SURE TO SET THIS VAR IN VERCEL
   credentials: true
 }));
+
+app.use(cors({
+  origin: [
+    "https://voxai-client.vercel.app", 
+    "http://localhost:5173" // Keep localhost for development
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ⚠️ Add OPTIONS explicitly
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
