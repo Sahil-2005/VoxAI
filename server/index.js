@@ -15,6 +15,12 @@ const app = express();
 // Connect to Database
 connectDB();
 
+
+app.use((req, res, next) => {
+  console.log(`Incoming Request: [${req.method}] ${req.url}`);
+  next();
+});
+
 // Middleware
 app.use(cors({
   origin: process.env.CLIENT_URL, // ⚠️ MAKE SURE TO SET THIS VAR IN VERCEL
@@ -49,6 +55,15 @@ app.use((req, res) => {
 // Error handler
 app.use(errorHandler);
 
+
+// Debug Route to check if server is reachable
+app.get('/api/debug', (req, res) => {
+  res.json({ 
+    message: 'Server is reachable!',
+    url: req.url,
+    method: req.method
+  });
+});
 // ---------------------------------------------------------
 // 🟢 CORRECTED STARTUP LOGIC
 // Only listen to the port if we are NOT in production (Vercel)
