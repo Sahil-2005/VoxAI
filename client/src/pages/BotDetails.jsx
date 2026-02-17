@@ -25,7 +25,7 @@ import axios from 'axios';
 import TriggerCall from '../components/TriggerCall';
 import CreateBot from './CreateBot';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 const CALLENGINE_BASE = 'http://localhost:8000';
 
 export default function BotDetails() {
