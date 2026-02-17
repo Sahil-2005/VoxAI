@@ -23,21 +23,14 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL, // ⚠️ MAKE SURE TO SET THIS VAR IN VERCEL
-  credentials: true
-}));
-
-app.use(cors({
   origin: [
-    "https://voxai-client.vercel.app", 
-    "http://localhost:5173" // Keep localhost for development
-  ],
+    process.env.CLIENT_URL,
+    "http://localhost:5173"
+  ].filter(Boolean),
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ⚠️ Add OPTIONS explicitly
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
-app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,6 +50,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug Route to check if server is reachable
+app.get('/api/debug', (req, res) => {
+  res.json({ 
+    message: 'Server is reachable!',
+    url: req.url,
+    method: req.method
+  });
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -67,16 +69,6 @@ app.use((req, res) => {
 
 // Error handler
 app.use(errorHandler);
-
-
-// Debug Route to check if server is reachable
-app.get('/api/debug', (req, res) => {
-  res.json({ 
-    message: 'Server is reachable!',
-    url: req.url,
-    method: req.method
-  });
-});
 // ---------------------------------------------------------
 // 🟢 CORRECTED STARTUP LOGIC
 // Only listen to the port if we are NOT in production (Vercel)
