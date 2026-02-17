@@ -17,7 +17,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_URL, // ⚠️ MAKE SURE TO SET THIS VAR IN VERCEL
   credentials: true
 }));
 app.use(express.json());
@@ -49,8 +49,18 @@ app.use((req, res) => {
 // Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 VoxAI API running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// ---------------------------------------------------------
+// 🟢 CORRECTED STARTUP LOGIC
+// Only listen to the port if we are NOT in production (Vercel)
+// Vercel handles the server startup automatically via the export.
+// ---------------------------------------------------------
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 VoxAI API running locally on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
+
+// Export the app for Vercel Serverless
+module.exports = app;
