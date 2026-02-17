@@ -34,4 +34,3 @@ Thumbs.db
 data/
 
 # Ignore the requirements.txt if it is auto-generated and shouldn't be manually tracked
-requirements.txt
