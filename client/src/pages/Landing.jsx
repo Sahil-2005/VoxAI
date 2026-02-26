@@ -168,14 +168,16 @@ const Landing = () => {
             {
                 opacity: 1,
                 y: 0,
-                duration: 0.8,
+                duration: 1,
                 stagger: 0.1,
                 ease: 'power3.out',
                 clearProps: 'all',
                 scrollTrigger: {
                     trigger: featuresRef.current,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse'
+                    start: 'top 85%',
+                    end: 'bottom 80%',
+                    toggleActions: 'play none none reverse',
+                    scrub: 1
                 }
             }
         );
@@ -184,8 +186,10 @@ const Landing = () => {
         gsap.from('.stat-item', {
             scrollTrigger: {
                 trigger: statsRef.current,
-                start: 'top 80%',
-                toggleActions: 'play none none reverse'
+                start: 'top 90%',
+                end: 'bottom 85%',
+                toggleActions: 'play none none reverse',
+                scrub: 0.5
             },
             opacity: 0,
             y: 40,
