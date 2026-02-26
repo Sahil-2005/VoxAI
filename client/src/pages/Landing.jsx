@@ -163,18 +163,22 @@ const Landing = () => {
         });
 
         // Features scroll animation
-        gsap.from('.feature-card', {
-            scrollTrigger: {
-                trigger: featuresRef.current,
-                start: 'top 80%',
-                toggleActions: 'play none none reverse'
-            },
-            opacity: 0,
-            y: 60,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power3.out'
-        });
+        gsap.fromTo('.feature-card',
+            { opacity: 0, y: 60 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power3.out',
+                clearProps: 'all',
+                scrollTrigger: {
+                    trigger: featuresRef.current,
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
 
         // Stats animation
         gsap.from('.stat-item', {
@@ -422,7 +426,7 @@ const Landing = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="feature-card group relative bg-zinc-900/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all duration-300"
+                                    className="feature-card group relative bg-zinc-900/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-colors duration-300"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                                     <div className={`inline-flex p-3 bg-gradient-to-br ${feature.gradient} bg-opacity-20 rounded-xl mb-4`}>
