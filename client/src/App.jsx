@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
+import SmoothScroll from './components/SmoothScroll';
 
 // Pages
 import Landing from './pages/Landing';
@@ -120,12 +121,16 @@ const AppRoutes = () => {
   );
 };
 
+// AppRoutes component already exists above...
+
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <SmoothScroll>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </SmoothScroll>
     </BrowserRouter>
   );
 }
