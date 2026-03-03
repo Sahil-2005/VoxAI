@@ -1,147 +1,160 @@
-# VoxAI - Intelligent Voice Agents Platform
+<div align="center">
+  # 🎙️ VoxAI
+  ### *Intelligent Voice Agents Platform*
 
-A premium AI-powered voice agent platform that enables businesses to deploy intelligent voice agents in minutes.
+  **[🚀 Live Demo](https://voxai-client.vercel.app/)**
 
-## Features
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Node.js Version](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+  [![React Version](https://img.shields.io/badge/React-19-61DAFB.svg)](https://reactjs.org/)
+  [![Vite](https://img.shields.io/badge/Vite-6-646CFF.svg)](https://vitejs.dev/)
 
-- 🤖 **AI Voice Agents** - Create and manage intelligent voice agents
-- 📞 **Twilio Integration** - Seamless phone call capabilities
-- 📊 **Analytics Dashboard** - Track calls, minutes, and performance
-- 🔐 **Secure Authentication** - JWT-based auth with bcrypt
-- 🎨 **Premium UI** - Modern dark theme with smooth animations
+  **A premium AI-powered voice agent platform enabling businesses to deploy intelligent voice agents in seconds.**
+</div>
 
-## Tech Stack
+---
 
-### Frontend
-- React 19 + Vite
-- TailwindCSS 4
-- Framer Motion (animations)
-- Lucide React (icons)
-- React Router DOM
-- Axios
+## ✨ Features
 
-### Backend
-- Node.js + Express 5
-- MongoDB + Mongoose
-- JWT Authentication
-- bcryptjs (password hashing)
+- 🤖 **AI Voice Agents** — Create, customize, and deploy intelligent voice agents powered by modern LLMs.
+- 📞 **Seamless Connectivity** — Integrated with Twilio for crystalline phone call capabilities.
+- 📊 **Real-time Analytics** — Professional dashboard to monitor calls, usage, and performance metrics.
+- 🔐 **Enterprise Security** — Secure JWT-based authentication with bcrypt password hashing.
+- 🎨 **Premium Experience** — Modern, high-performance dark theme with smooth GSAP & Framer Motion animations.
 
-## Project Structure
+## 🛠️ Tech Stack
 
-```
+<details open>
+<summary><b>Frontend</b></summary>
+
+- **Core:** React 19, Vite 6
+- **Styling:** TailwindCSS 4
+- **Animations:** Framer Motion, GSAP, Lenis (Smooth Scroll)
+- **Icons:** Lucide React
+- **State/Routing:** React Context API, React Router DOM
+</details>
+
+<details open>
+<summary><b>Backend</b></summary>
+
+- **Core:** Node.js, Express 5
+- **Database:** MongoDB + Mongoose
+- **Auth:** JWT, bcryptjs
+- **Services:** Twilio API
+</details>
+
+---
+
+## 📂 Project Structure
+
+```bash
 VoiceAgent/
-├── client/                 # Frontend React application
+├── client/                 # Frontend React application (Vite)
 │   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── context/        # React Context (Auth)
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API service layer
-│   │   └── App.jsx         # Main app component
-│   └── package.json
-│
+│   │   ├── components/     # High-end UI components
+│   │   ├── context/        # Auth & Application State
+│   │   ├── pages/          # Landing, Dashboard, Profile
+│   │   └── services/       # API integration layer
 ├── server/                 # Backend Node.js API
-│   ├── config/             # Database & constants
-│   ├── controllers/        # Route controllers
-│   ├── middleware/         # Auth & error handling
-│   ├── models/             # Mongoose models
-│   ├── routes/             # API routes
-│   └── index.js            # Server entry point
-│
-└── README.md
+│   ├── config/             # DB & Environment config
+│   ├── controllers/        # Business logic
+│   ├── models/             # Schema definitions
+│   └── routes/             # RESTful endpoints
 ```
 
-## Getting Started
+---
 
-### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Twilio Account (optional, for calls)
+## 🚀 Getting Started
 
-### Twilio Setup (Important)
+### 📋 Prerequisites
 
-To enable voice capabilities, you need to configure Twilio:
+- **Node.js** 18.x or higher
+- **MongoDB** (Local instance or Atlas)
+- **Twilio Account** (For voice agent capabilities)
 
-1.  **Sign Up**: Create a free account at [Twilio](https://www.twilio.com/try-twilio).
-2.  **Get a Number**: Buy a phone number with Voice capabilities (free with trial credit).
-3.  **Credentials**: Get your `Account SID` and `Auth Token` from the console.
-4.  **Verified Caller IDs**: If using a **Free Trial Account**, you must verify any phone number you wish to call in the [Verified Caller IDs](https://console.twilio.com/us1/develop/phone-numbers/manage/verified) section. Calls to unverified numbers will fail on trial accounts.
+### ⚙️ Twilio Configuration
 
-### Installation
+> [!IMPORTANT]
+> To enable voice capabilities, you must configure your Twilio credentials.
 
-1. **Clone the repository**
-```bash
-cd VoiceAgent
-```
+1.  **Sign Up**: Create an account at [Twilio](https://www.twilio.com/try-twilio).
+2.  **Get a Number**: Provision a phone number with Voice capabilities.
+3.  **Credentials**: Retrieve your `Account SID` and `Auth Token`.
+4.  **Verified Caller IDs**: On trial accounts, verify the recipient number in the [Twilio Console](https://console.twilio.com/us1/develop/phone-numbers/manage/verified).
 
-2. **Install dependencies**
-```bash
-# Install server dependencies
-cd server
-npm install
+### 🛠️ Installation & Setup
 
-# Install client dependencies
-cd ../client
-npm install
-```
+1. **Clone & Navigate**
+   ```bash
+   git clone <repository-url>
+   cd VoxAi
+   ```
 
-3. **Configure environment variables**
+2. **Environment Configuration**
 
-Server (.env):
-```env
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/voxai
-JWT_SECRET=your_super_secret_key
-CLIENT_URL=http://localhost:5173
-```
+   Create a `.env` in both `/server` and `/client`:
 
-Client (.env):
-```env
-VITE_API_URL=http://localhost:5000/api
-```
+   **Server (`/server/.env`):**
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_uri
+   JWT_SECRET=your_secret_key
+   CLIENT_URL=http://localhost:5173
+   ```
 
-4. **Start the development servers**
+   **Client (`/client/.env`):**
+   ```env
+   VITE_API_URL=http://localhost:5000/api
+   ```
 
-```bash
-# Start backend (from server folder)
-npm run dev
+3. **Install & Launch**
+   ```bash
+   # In root
+   npm install # if using workspaces, or install individually:
+   cd server && npm install && npm run dev
+   # In a new terminal
+   cd client && npm install && npm run dev
+   ```
 
-# Start frontend (from client folder)
-npm run dev
-```
+---
 
-5. **Open the application**
-Navigate to `http://localhost:5173`
+## 🌐 API Reference
 
-## API Endpoints
+### 🔐 Authentication
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/auth/register` | `POST` | Create a new user account |
+| `/api/auth/login` | `POST` | Authenticate and get JWT |
+| `/api/auth/me` | `GET` | Retrieve current user profile |
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-- `PUT /api/auth/profile` - Update profile
-- `PUT /api/auth/twilio` - Update Twilio config
+### 🤖 Voice Agents
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/bots` | `GET` | List all available agents |
+| `/api/bots` | `POST` | Deploy a new intelligent agent |
+| `/api/bots/:id` | `PUT` | Update agent configuration |
+| `/api/bots/stats/dashboard` | `GET` | Fetch performance analytics |
 
-### Voice Agents (Bots)
-- `GET /api/bots` - Get all bots
-- `POST /api/bots` - Create new bot
-- `GET /api/bots/:id` - Get single bot
-- `PUT /api/bots/:id` - Update bot
-- `DELETE /api/bots/:id` - Delete bot
-- `GET /api/bots/stats/dashboard` - Get dashboard stats
+---
 
-## Recent Updates
 
-- Updated CORS policy setup
-- Added debugging capabilities
+## 👨‍💻 Author
 
-## Author
+<div align="center">
+  <h3>Sahil Gawade</h3>
 
-- **GitHub:** [Sahil-2005](https://github.com/Sahil-2005)
-- **LinkedIn:** [Sahil Gawade](https://www.linkedin.com/in/sahil-gawade-920a0a242/)
-- **Email:** [gawadesahil.dev@gmail.com](mailto:gawadesahil.dev@gmail.com)
-- **Portfolio:** [sahil-gawade.vercel.app](https://sahil-gawade.vercel.app/)
+  <p>
+    <a href="https://github.com/Sahil-2005"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+    <a href="https://www.linkedin.com/in/sahil-gawade-920a0a242/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+    <a href="mailto:gawadesahil.dev@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"></a>
+    <a href="https://sahil-gawade.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio"></a>
+  </p>
+</div>
 
-## License
+---
 
-MIT License - © 2026 VoxAI Inc.
+## 📄 License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+© 2026 **VoxAI Inc.**
