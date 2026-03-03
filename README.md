@@ -130,6 +130,18 @@ Navigate to `http://localhost:5173`
 - `DELETE /api/bots/:id` - Delete bot
 - `GET /api/bots/stats/dashboard` - Get dashboard stats
 
+## Recent Updates
+
+- Updated CORS policy setup
+- Added debugging capabilities
+
+## Author
+
+- **GitHub:** [Sahil-2005](https://github.com/Sahil-2005)
+- **LinkedIn:** [Sahil Gawade](https://www.linkedin.com/in/sahil-gawade-920a0a242/)
+- **Email:** [gawadesahil.dev@gmail.com](mailto:gawadesahil.dev@gmail.com)
+- **Portfolio:** [sahil-gawade.vercel.app](https://sahil-gawade.vercel.app/)
+
 ## License
 
 MIT License - © 2026 VoxAI Inc.
