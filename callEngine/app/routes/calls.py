@@ -146,24 +146,78 @@ async def generate_audio_for_script(slug: str, request: AudioGenerationRequest):
         generated: List[str] = []
         failed:    List[dict] = []
 
-        for item in request.script_data.flow:
+        # ── Default system nodes required by voice.py ──────────────────────────
+        # voice.py always calls get_audio_url(slug, "intro"), "outro", and "error".
+        # If the frontend payload omits these keys the Cloudinary asset won't exist
+        # and Twilio will receive a 404, crashing the call. We inject sensible
+        # language-aware defaults for any missing system key before generation.
+        SYSTEM_DEFAULTS: dict[str, dict[str, str]] = {
+            "intro": {
+                "en-US": "Hello! Please press any key to start.",
+                "en-GB": "Hello! Please press any key to start.",
+                "hi-IN": "नमस्ते! जारी रखने के लिए कोई भी बटन दबाएँ।",
+                "es-ES": "¡Hola! Por favor, presione cualquier tecla para comenzar.",
+                "fr-FR": "Bonjour! Veuillez appuyer sur n'importe quelle touche pour commencer.",
+                "de-DE": "Hallo! Bitte drücken Sie eine beliebige Taste, um zu beginnen.",
+                "ja-JP": "こんにちは！何かキーを押して開始してください。",
+                "zh-CN": "你好！请按任意键开始。",
+            },
+            "outro": {
+                "en-US": "Thank you for your time. Goodbye!",
+                "en-GB": "Thank you for your time. Goodbye!",
+                "hi-IN": "आपके समय के लिए धन्यवाद। अलविदा!",
+                "es-ES": "Gracias por su tiempo. ¡Adiós!",
+                "fr-FR": "Merci pour votre temps. Au revoir!",
+                "de-DE": "Danke für Ihre Zeit. Auf Wiedersehen!",
+                "ja-JP": "お時間をいただきありがとうございます。さようなら！",
+                "zh-CN": "感谢您的时间。再见！",
+            },
+            "error": {
+                "en-US": "Sorry, I didn't catch that. Please try again.",
+                "en-GB": "Sorry, I didn't catch that. Please try again.",
+                "hi-IN": "माफ़ करें, मुझे आपकी बात सुनाई नहीं दी। कृपया दोबारा बोलें।",
+                "es-ES": "Lo siento, no entendí eso. Por favor, inténtelo de nuevo.",
+                "fr-FR": "Désolé, je n'ai pas compris. Veuillez réessayer.",
+                "de-DE": "Entschuldigung, ich habe das nicht verstanden. Bitte versuchen Sie es erneut.",
+                "ja-JP": "申し訳ありません、聞き取れませんでした。もう一度お試しください。",
+                "zh-CN": "对不起，我没有听清楚。请再试一次。",
+            },
+        }
+
+        # Build the generation queue: start from the incoming flow items …
+        existing_keys = {item.key for item in request.script_data.flow}
+        generation_queue: List[dict] = [
+            {"key": item.key, "text": item.text}
+            for item in request.script_data.flow
+        ]
+
+        # … then append any missing system nodes with localised default text
+        for system_key, translations in SYSTEM_DEFAULTS.items():
+            if system_key not in existing_keys:
+                default_text = translations.get(language, translations["en-US"])
+                generation_queue.append({"key": system_key, "text": default_text})
+                print(f"ℹ️  Auto-injecting default '{system_key}' node for lang={language}")
+
+        for item in generation_queue:
             tmp_path = None
+            key  = item["key"]
+            text = item["text"]
             try:
-                print(f"🎙️  Generating: {item.key} ...")
+                print(f"🎙️  Generating: {key} ...")
 
                 with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
                     tmp_path = tmp.name
 
-                communicate = edge_tts.Communicate(item.text, voice)
+                communicate = edge_tts.Communicate(text, voice)
                 await communicate.save(tmp_path)
 
-                secure_url = await upload_audio(tmp_path, slug, item.key)
-                generated.append(item.key)
-                print(f"✅ Uploaded: {item.key} → {secure_url}")
+                secure_url = await upload_audio(tmp_path, slug, key)
+                generated.append(key)
+                print(f"✅ Uploaded: {key} → {secure_url}")
 
             except Exception as e:
-                print(f"❌ Error for {item.key}: {e}")
-                failed.append({"key": item.key, "error": str(e)})
+                print(f"❌ Error for {key}: {e}")
+                failed.append({"key": key, "error": str(e)})
             finally:
                 if tmp_path and os.path.exists(tmp_path):
                     os.remove(tmp_path)
