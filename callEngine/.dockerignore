@@ -1,0 +1,46 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment & secrets — NEVER bake into the image
+.env
+*.env
+
+# Local audio cache — not needed; Cloudinary is the source of truth
+app/static/
+
+# Data directory (local call logs, not needed in container)
+data/
+
+# Git metadata
+.git/
+.gitignore
+
+# IDE and editor configs
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# macOS artefacts
+.DS_Store
+
+# Build / dist artefacts
+dist/
+build/
+*.egg-info/
+
+# Test files
+tests/
+*.test.py
+pytest.ini
+.pytest_cache/
+
+# Logs
+*.log
